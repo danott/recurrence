@@ -33,7 +33,7 @@ func Dates(t TimeRange, r Rule) (result []time.Time) {
 }
 
 func (r TimeRange) eachDate() (result []time.Time) {
-	for t := r.startTime; t.Before(r.endTime); t = t.AddDate(0, 0, 1) {
+	for t := r.startTime; !t.After(r.endTime); t = t.AddDate(0, 0, 1) {
 		result = append(result, t)
 	}
 	return
