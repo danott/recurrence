@@ -3,28 +3,22 @@ package recurrence
 import "time"
 
 type OrdinalWeekday struct {
-	Week    int
-	Weekday time.Weekday
+	week    int
+	weekday time.Weekday
 }
 
-func (d OrdinalWeekday) Includes(t time.Time) (r bool) {
-	if d.Week > 0 {
-		r = (d.Weekday == t.Weekday() && weekFromMonthStart(t) == d.Week)
+func (d OrdinalWeekday) Includes(t time.Time) bool {
+	if d.week == Last {
+		return d.weekday == t.Weekday() && isLastWeekInMonth(t)
 	} else {
-		r = (d.Weekday == t.Weekday() && weekFromMonthEnd(t) == d.Week)
+		return d.weekday == t.Weekday() && weekFromMonthStart(t) == d.week
 	}
-	return
 }
 
 func weekFromMonthStart(t time.Time) int {
 	return ((t.Day() - 1) / 7) + 1
 }
 
-func daysIn(m time.Month, year int) int {
-	return time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC).Day()
-}
-
-func weekFromMonthEnd(t time.Time) int {
-	d := daysIn(t.Month(), t.Year())
-	return (((d - t.Day()) / 7) * -1) - 1
+func isLastWeekInMonth(t time.Time) bool {
+	return t.Month() != t.AddDate(0, 0, 7).Month()
 }
