@@ -5,16 +5,16 @@ import (
 	"time"
 )
 
-func assertStartTimeAndEndTime(t *testing.T, r TimeRange, startTime string, endTime string) {
-	expectedStartTime, _ := time.Parse(f, startTime)
-	expectedEndTime, _ := time.Parse(f, endTime)
+func assertStartTimeAndEndTime(t *testing.T, r TimeRange, start string, end string) {
+	expectedStartTime, _ := time.Parse(f, start)
+	expectedEndTime, _ := time.Parse(f, end)
 
-	if !r.startTime.Equal(expectedStartTime) {
-		t.Errorf("%s should have been %s", r.startTime, expectedStartTime)
+	if !r.start.Equal(expectedStartTime) {
+		t.Errorf("%s should have been %s", r.start, expectedStartTime)
 	}
 
-	if !r.endTime.Equal(expectedEndTime) {
-		t.Errorf("%s should have been %s", r.endTime, expectedEndTime)
+	if !r.end.Equal(expectedEndTime) {
+		t.Errorf("%s should have been %s", r.end, expectedEndTime)
 	}
 }
 
@@ -49,10 +49,20 @@ func assertLength(t *testing.T, e int, s []time.Time) {
 }
 
 func TestTimeRangeDates(t *testing.T) {
-	m := MonthRange(January, 2006)
+	m := MonthRange(time.January, 2006)
 	y := YearRange(2006)
 
-	assertLength(t, 5, Dates(m, Weekday{Sunday}))
-	assertLength(t, 7, Dates(y, Day{ThirtyFirst}))
+	assertLength(t, 5, Dates(m, Sunday))
+	assertLength(t, 7, Dates(y, Day(31)))
 	assertLength(t, 12, Dates(y, OrdinalWeekday{Last, Sunday}))
+}
+
+func TestMonthRangeAcceptableArguments(t *testing.T) {
+	MonthRange(January, 2006)
+	MonthRange(time.January, 2006)
+	MonthRange(1, 2006)
+
+	if x := recover(); x != nil {
+		t.Errorf("Panicked on MonthRange tests")
+	}
 }

@@ -3,7 +3,10 @@ package recurrence
 import "testing"
 
 func TestUnion(t *testing.T) {
-	u := Union{OrdinalWeekday{First, Sunday}, Day{Last}}
+	u := Union{
+		OrdinalWeekday{First, Sunday},
+		Day(Last),
+	}
 	r := YearRange(2006)
 
 	assertOnlyIncludes(t, r, u, "2006-01-01", "2006-02-05", "2006-03-05",
@@ -15,7 +18,10 @@ func TestUnion(t *testing.T) {
 }
 
 func TestIntersection(t *testing.T) {
-	i := Intersection{Month{January}, Weekday{Sunday}}
+	i := Intersection{
+		January,
+		Sunday,
+	}
 	r := YearRange(2006)
 
 	assertOnlyIncludes(t, r, i, "2006-01-01", "2006-01-08", "2006-01-15",
@@ -23,10 +29,13 @@ func TestIntersection(t *testing.T) {
 }
 
 func TestDifference(t *testing.T) {
-	d := Difference{[]Rule{Day{Last}}, []Rule{Month{November}}}
+	d := Difference{
+		Day(Last),
+		Union{September, November},
+	}
 	r := YearRange(2006)
 
 	assertOnlyIncludes(t, r, d, "2006-01-31", "2006-02-28", "2006-03-31",
 		"2006-04-30", "2006-05-31", "2006-06-30", "2006-07-31", "2006-08-31",
-		"2006-09-30", "2006-10-31", "2006-12-31")
+		"2006-10-31", "2006-12-31")
 }

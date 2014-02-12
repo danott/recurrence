@@ -1,30 +1,48 @@
 package recurrence
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type TimeRange struct {
-	startTime time.Time
-	endTime   time.Time
+	start time.Time
+	end   time.Time
 }
 
 func (r TimeRange) Includes(t time.Time) bool {
-	return !(t.Before(r.startTime) || t.After(r.endTime))
+	return !(t.Before(r.start) || t.After(r.end))
 }
 
 func YearRange(y int) TimeRange {
-	startTime := time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC)
-	endTime := time.Date(y+1, time.January, 0, 0, 0, 0, 0, time.UTC)
-	return TimeRange{startTime, endTime}
+	return TimeRange{
+		time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(y+1, time.January, 0, 0, 0, 0, 0, time.UTC),
+	}
 }
 
-func MonthRange(m time.Month, y int) TimeRange {
-	startTime := time.Date(y, m, 1, 0, 0, 0, 0, time.UTC)
-	endTime := time.Date(y, m+1, 0, 0, 0, 0, 0, time.UTC)
-	return TimeRange{startTime, endTime}
+func MonthRange(month interface{}, year int) TimeRange {
+	var m time.Month
+
+	switch t := month.(type) {
+	case int:
+		m = time.Month(t)
+	case Month:
+		m = time.Month(t)
+	case time.Month:
+		m = t
+	default:
+		panic(fmt.Sprintf("MonthRange can't use %T", month))
+	}
+
+	return TimeRange{
+		time.Date(year, m, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC),
+	}
 }
 
 func Dates(t TimeRange, r Rule) (result []time.Time) {
-	for _, t := range t.eachDate() {
+	for t := range t.eachDate() {
 		if r.Includes(t) {
 			result = append(result, t)
 		}
@@ -32,9 +50,15 @@ func Dates(t TimeRange, r Rule) (result []time.Time) {
 	return
 }
 
-func (r TimeRange) eachDate() (result []time.Time) {
-	for t := r.startTime; !t.After(r.endTime); t = t.AddDate(0, 0, 1) {
-		result = append(result, t)
-	}
-	return
+func (r TimeRange) eachDate() chan time.Time {
+	c := make(chan time.Time)
+
+	go func() {
+		for t := r.start; !t.After(r.end); t = t.AddDate(0, 0, 1) {
+			c <- t
+		}
+		close(c)
+	}()
+
+	return c
 }

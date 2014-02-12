@@ -23,18 +23,18 @@ func assertExcludes(t *testing.T, r Rule, s ...string) {
 	}
 }
 
-func assertOnlyIncludes(t *testing.T, r TimeRange, te Rule, s ...string) {
+func assertOnlyIncludes(t *testing.T, tr TimeRange, r Rule, s ...string) {
 	include := make(map[string]bool)
 
 	for _, s := range s {
 		include[s] = true
 	}
 
-	for _, aDate := range r.eachDate() {
+	for aDate := range tr.eachDate() {
 		if _, ok := include[aDate.Format(f)]; ok {
-			assertIncludes(t, te, aDate.Format(f))
+			assertIncludes(t, r, aDate.Format(f))
 		} else {
-			assertExcludes(t, te, aDate.Format(f))
+			assertExcludes(t, r, aDate.Format(f))
 		}
 	}
 }

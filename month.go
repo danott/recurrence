@@ -2,8 +2,10 @@ package recurrence
 
 import "time"
 
+type Month time.Month
+
 const (
-	January time.Month = 1 + iota
+	January Month = 1 + iota
 	February
 	March
 	April
@@ -17,10 +19,6 @@ const (
 	December
 )
 
-type Month struct {
-	month time.Month
-}
-
 func (m Month) Includes(t time.Time) bool {
-	return t.Month() == m.month
+	return t.Month() == time.Month(m)
 }

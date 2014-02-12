@@ -2,15 +2,13 @@ package recurrence
 
 import "time"
 
-type Day struct {
-	day int
-}
+type Day int
 
 func (d Day) Includes(t time.Time) bool {
-	if d.day == Last {
+	if d := int(d); d == Last {
 		return isLastDayInMonth(t)
 	} else {
-		return t.Day() == d.day
+		return d == t.Day()
 	}
 }
 

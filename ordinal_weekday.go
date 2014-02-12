@@ -4,18 +4,22 @@ import "time"
 
 type OrdinalWeekday struct {
 	week    int
-	weekday time.Weekday
+	weekday Weekday
 }
 
-func (d OrdinalWeekday) Includes(t time.Time) bool {
-	if d.week == Last {
-		return d.weekday == t.Weekday() && isLastWeekInMonth(t)
+func (o OrdinalWeekday) Includes(t time.Time) bool {
+	return o.weekday.Includes(t) && weekMatches(o, t)
+}
+
+func weekMatches(o OrdinalWeekday, t time.Time) bool {
+	if o.week == Last {
+		return isLastWeekInMonth(t)
 	} else {
-		return d.weekday == t.Weekday() && weekFromMonthStart(t) == d.week
+		return weekInMonth(t) == o.week
 	}
 }
 
-func weekFromMonthStart(t time.Time) int {
+func weekInMonth(t time.Time) int {
 	return ((t.Day() - 1) / 7) + 1
 }
 

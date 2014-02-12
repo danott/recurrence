@@ -25,20 +25,18 @@ func (u Union) Includes(t time.Time) bool {
 }
 
 type Difference struct {
-	Include []Rule
-	Exclude []Rule
+	Included Rule
+	Excluded Rule
 }
 
 func (d Difference) Includes(t time.Time) bool {
-	for _, r := range d.Exclude {
-		if r.Includes(t) {
-			return false
-		}
+	if d.Excluded.Includes(t) {
+		return false
 	}
-	for _, r := range d.Include {
-		if r.Includes(t) {
-			return true
-		}
+
+	if d.Included.Includes(t) {
+		return true
 	}
+
 	return false
 }

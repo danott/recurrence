@@ -2,8 +2,10 @@ package recurrence
 
 import "time"
 
+type Weekday time.Weekday
+
 const (
-	Sunday time.Weekday = iota
+	Sunday Weekday = iota
 	Monday
 	Tuesday
 	Wednesday
@@ -12,10 +14,6 @@ const (
 	Saturday
 )
 
-type Weekday struct {
-	weekday time.Weekday
-}
-
 func (w Weekday) Includes(t time.Time) bool {
-	return t.Weekday() == w.weekday
+	return t.Weekday() == time.Weekday(w)
 }
