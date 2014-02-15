@@ -11,6 +11,10 @@ func (o OrdinalWeekday) Includes(t time.Time) bool {
 	return o.weekday.Includes(t) && weekMatches(o, t)
 }
 
+func (o OrdinalWeekday) Dates(t TimeRange) chan time.Time {
+	return t.datesMatchingRule(o)
+}
+
 func weekMatches(o OrdinalWeekday, t time.Time) bool {
 	if o.week == Last {
 		return isLastWeekInMonth(t)

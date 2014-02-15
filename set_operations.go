@@ -13,6 +13,10 @@ func (i Intersection) Includes(t time.Time) bool {
 	return true
 }
 
+func (i Intersection) Dates(t TimeRange) chan time.Time {
+	return t.datesMatchingRule(i)
+}
+
 type Union []Rule
 
 func (u Union) Includes(t time.Time) bool {
@@ -22,6 +26,10 @@ func (u Union) Includes(t time.Time) bool {
 		}
 	}
 	return false
+}
+
+func (u Union) Dates(t TimeRange) chan time.Time {
+	return t.datesMatchingRule(u)
 }
 
 type Difference struct {
@@ -39,4 +47,8 @@ func (d Difference) Includes(t time.Time) bool {
 	}
 
 	return false
+}
+
+func (d Difference) Dates(t TimeRange) chan time.Time {
+	return t.datesMatchingRule(d)
 }

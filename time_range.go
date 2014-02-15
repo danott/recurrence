@@ -41,13 +41,23 @@ func MonthRange(month interface{}, year int) TimeRange {
 	}
 }
 
-func Dates(t TimeRange, r Rule) (result []time.Time) {
-	for t := range t.eachDate() {
-		if r.Includes(t) {
-			result = append(result, t)
+func (t TimeRange) Dates(other TimeRange) chan time.Time {
+	return t.datesMatchingRule(other)
+}
+
+func (t TimeRange) datesMatchingRule(r Rule) chan time.Time {
+	c := make(chan time.Time)
+
+	go func() {
+		for t := range t.eachDate() {
+			if r.Includes(t) {
+				c <- t
+			}
 		}
-	}
-	return
+		close(c)
+	}()
+
+	return c
 }
 
 func (r TimeRange) eachDate() chan time.Time {

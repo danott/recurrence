@@ -12,6 +12,10 @@ func (d Day) Includes(t time.Time) bool {
 	}
 }
 
+func (d Day) Dates(t TimeRange) chan time.Time {
+	return t.datesMatchingRule(d)
+}
+
 func isLastDayInMonth(t time.Time) bool {
 	return t.Month() != t.AddDate(0, 0, 1).Month()
 }

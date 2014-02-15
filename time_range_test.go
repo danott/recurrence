@@ -42,21 +42,6 @@ func TestMonthRangeIncludes(t *testing.T) {
 		"2006-01-29", "2006-01-30", "2006-01-31")
 }
 
-func assertLength(t *testing.T, e int, s []time.Time) {
-	if e != len(s) {
-		t.Errorf("Expected length %d, got %d.", e, len(s))
-	}
-}
-
-func TestTimeRangeDates(t *testing.T) {
-	m := MonthRange(time.January, 2006)
-	y := YearRange(2006)
-
-	assertLength(t, 5, Dates(m, Sunday))
-	assertLength(t, 7, Dates(y, Day(31)))
-	assertLength(t, 12, Dates(y, OrdinalWeekday{Last, Sunday}))
-}
-
 func TestMonthRangeAcceptableArguments(t *testing.T) {
 	MonthRange(January, 2006)
 	MonthRange(time.January, 2006)
