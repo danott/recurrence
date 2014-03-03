@@ -10,7 +10,7 @@ type TimeRange struct {
 	end   time.Time
 }
 
-func (r TimeRange) Includes(t time.Time) bool {
+func (r TimeRange) IsOccurring(t time.Time) bool {
 	return !(t.Before(r.start) || t.After(r.end))
 }
 
@@ -41,16 +41,16 @@ func MonthRange(month interface{}, year int) TimeRange {
 	}
 }
 
-func (t TimeRange) Dates(other TimeRange) chan time.Time {
-	return t.datesMatchingRule(other)
+func (t TimeRange) Occurrences(other TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(other)
 }
 
-func (t TimeRange) datesMatchingRule(r Rule) chan time.Time {
+func (t TimeRange) occurrencesOfSchedule(s Schedule) chan time.Time {
 	c := make(chan time.Time)
 
 	go func() {
 		for t := range t.eachDate() {
-			if r.Includes(t) {
+			if s.IsOccurring(t) {
 				c <- t
 			}
 		}

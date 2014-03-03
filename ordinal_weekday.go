@@ -1,5 +1,5 @@
 package recurrence
 
-func OrdinalWeekday(w int, wd Weekday) Rule {
-	return Intersection{Week(w), wd}
+func OrdinalWeekday(i int, w Weekday) Schedule {
+	return Intersection{Week(i), w}
 }

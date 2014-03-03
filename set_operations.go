@@ -2,53 +2,53 @@ package recurrence
 
 import "time"
 
-type Intersection []Rule
+type Intersection []Schedule
 
-func (i Intersection) Includes(t time.Time) bool {
+func (i Intersection) IsOccurring(t time.Time) bool {
 	for _, r := range i {
-		if r.Includes(t) == false {
+		if r.IsOccurring(t) == false {
 			return false
 		}
 	}
 	return true
 }
 
-func (i Intersection) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(i)
+func (i Intersection) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(i)
 }
 
-type Union []Rule
+type Union []Schedule
 
-func (u Union) Includes(t time.Time) bool {
+func (u Union) IsOccurring(t time.Time) bool {
 	for _, r := range u {
-		if r.Includes(t) {
+		if r.IsOccurring(t) {
 			return true
 		}
 	}
 	return false
 }
 
-func (u Union) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(u)
+func (u Union) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(u)
 }
 
 type Difference struct {
-	Included Rule
-	Excluded Rule
+	Included Schedule
+	Excluded Schedule
 }
 
-func (d Difference) Includes(t time.Time) bool {
-	if d.Excluded.Includes(t) {
+func (d Difference) IsOccurring(t time.Time) bool {
+	if d.Excluded.IsOccurring(t) {
 		return false
 	}
 
-	if d.Included.Includes(t) {
+	if d.Included.IsOccurring(t) {
 		return true
 	}
 
 	return false
 }
 
-func (d Difference) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(d)
+func (d Difference) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(d)
 }

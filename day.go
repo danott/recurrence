@@ -4,7 +4,7 @@ import "time"
 
 type Day int
 
-func (d Day) Includes(t time.Time) bool {
+func (d Day) IsOccurring(t time.Time) bool {
 	if d := int(d); d == Last {
 		return isLastDayInMonth(t)
 	} else {
@@ -12,8 +12,8 @@ func (d Day) Includes(t time.Time) bool {
 	}
 }
 
-func (d Day) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(d)
+func (d Day) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(d)
 }
 
 func isLastDayInMonth(t time.Time) bool {

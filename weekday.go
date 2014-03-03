@@ -14,10 +14,10 @@ const (
 	Saturday
 )
 
-func (w Weekday) Includes(t time.Time) bool {
+func (w Weekday) IsOccurring(t time.Time) bool {
 	return t.Weekday() == time.Weekday(w)
 }
 
-func (w Weekday) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(w)
+func (w Weekday) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(w)
 }

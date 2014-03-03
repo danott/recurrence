@@ -19,10 +19,10 @@ const (
 	December
 )
 
-func (m Month) Includes(t time.Time) bool {
+func (m Month) IsOccurring(t time.Time) bool {
 	return t.Month() == time.Month(m)
 }
 
-func (m Month) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(m)
+func (m Month) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(m)
 }

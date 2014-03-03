@@ -4,7 +4,7 @@ import "time"
 
 type Week int
 
-func (w Week) Includes(t time.Time) bool {
+func (w Week) IsOccurring(t time.Time) bool {
 	if w := int(w); w == Last {
 		return isLastWeekInMonth(t)
 	} else {
@@ -12,8 +12,8 @@ func (w Week) Includes(t time.Time) bool {
 	}
 }
 
-func (w Week) Dates(t TimeRange) chan time.Time {
-	return t.datesMatchingRule(w)
+func (w Week) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(w)
 }
 
 func weekInMonth(t time.Time) int {
