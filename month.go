@@ -2,6 +2,7 @@ package recurrence
 
 import "time"
 
+// A Month represents a month of the year. Just like time.Month.
 type Month time.Month
 
 const (

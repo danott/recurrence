@@ -2,6 +2,7 @@ package recurrence
 
 import "time"
 
+// A Weekday represents a day of the week. (Sunday, Monday, ...Saturday)
 type Weekday time.Weekday
 
 const (

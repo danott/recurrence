@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// A TimeRange represents a range of time, with a start and an end.
 type TimeRange struct {
 	start time.Time
 	end   time.Time
@@ -14,6 +15,7 @@ func (r TimeRange) IsOccurring(t time.Time) bool {
 	return !(t.Before(r.start) || t.After(r.end))
 }
 
+// Generate a TimeRange representing the entire year.
 func YearRange(y int) TimeRange {
 	return TimeRange{
 		time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC),
@@ -21,6 +23,7 @@ func YearRange(y int) TimeRange {
 	}
 }
 
+// Generate a TimeRange representing a specific month.
 func MonthRange(month interface{}, year int) TimeRange {
 	var m time.Month
 

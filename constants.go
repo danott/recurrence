@@ -1,11 +1,13 @@
 package recurrence
 
+// Integers representing the natural language expression of dates. (i.e. "First
+// Sunday")
 const (
-	First int = 1 + iota
+	Last int = -1 + iota
+	Never
+	First
 	Second
 	Third
 	Fourth
 	Fifth
 )
-
-const Last int = -1

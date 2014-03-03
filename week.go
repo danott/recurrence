@@ -2,6 +2,8 @@ package recurrence
 
 import "time"
 
+// A Week represents a week of the month. This is most useful in combination
+// with other entities satisfying the Schedule interface.
 type Week int
 
 func (w Week) IsOccurring(t time.Time) bool {

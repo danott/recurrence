@@ -2,6 +2,7 @@ package recurrence
 
 import "time"
 
+// A Day specifies a day of the month. (1, 2, 3, ...31)
 type Day int
 
 func (d Day) IsOccurring(t time.Time) bool {
