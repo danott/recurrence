@@ -17,9 +17,9 @@ The `Schedule` interface is the foundation of the recurrence package. By using a
 Integer day of the month, 1 through 31, or the constant `Last`.
 
 ```go
-first := Day{First} // Day {1}
-last := Day{Last}
-twentieth := Day{20}
+first := Day(First) // Day(1)
+last := Day(Last)
+twentieth := Day(20)
 ```
 
 ## Week
@@ -27,9 +27,9 @@ twentieth := Day{20}
 Integer week of the month, 1 through 5, or the constant `Last`.
 
 ```go
-first := Week{First} // Week {1}
-last := Week{Last}
-third := Week{Third} // Week {3}
+first := Week(First) // Week(1)
+last := Week(Last)
+third := Week(Third) // Week(3)
 ```
 
 ## Weekday
@@ -56,7 +56,7 @@ Intersection is a slice of Schedules. `IsOccurring` is only satisfied if all mem
 
 ```go
 // Complex Rules
-american_thanksgiving := recurrence.Intersection{Week{4}, Thursday, November}
+american_thanksgiving := recurrence.Intersection{Week(4), Thursday, November}
 ```
 
 ### Union
