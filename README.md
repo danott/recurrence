@@ -16,7 +16,7 @@ The `Schedule` interface is the foundation of the recurrence package. By using a
 
 Integer day of the month, 1 through 31, or the constant `Last`.
 
-```golang
+```go
 first := Day{First} // Day {1}
 last := Day{Last}
 twentieth := Day{20}
@@ -26,7 +26,7 @@ twentieth := Day{20}
 
 Integer week of the month, 1 through 5, or the constant `Last`.
 
-```golang
+```go
 first := Week{First} // Week {1}
 last := Week{Last}
 third := Week{Third} // Week {3}
@@ -36,7 +36,7 @@ third := Week{Third} // Week {3}
 
 Day of the week, Sunday through Monday. Constants are defined so you can use them with ease.
 
-```golang
+```go
 Sunday.IsOccurring(time.Now())
 ```
 
@@ -44,7 +44,7 @@ Sunday.IsOccurring(time.Now())
 
 A month of the year. Constants are defined to be used with ease.
 
-```golang
+```go
 January.IsOccurring(time.Now())
 ```
 
@@ -54,7 +54,7 @@ January.IsOccurring(time.Now())
 
 Intersection is a slice of Schedules. `IsOccurring` is only satisfied if all members of the slice are true. (Set intersection).
 
-```golang
+```go
 // Complex Rules
 american_thanksgiving := recurrence.Intersection{Week{4}, Thursday, November}
 ```
@@ -63,7 +63,7 @@ american_thanksgiving := recurrence.Intersection{Week{4}, Thursday, November}
 
 Union is a slice of Schedules. `IsOccurring` is satisfied if any member of the slice is occurring. (Set union).
 
-```golang
+```go
 weekends := recurrence.Union{Saturday, Sunday}
 ```
 
@@ -71,7 +71,7 @@ weekends := recurrence.Union{Saturday, Sunday}
 
 Difference computes the set difference between two schedules.
 
-```golang
+```go
 the_last_day_of_every_mont_except_september := recurrence.Difference{
    Day(Last),
    September,
