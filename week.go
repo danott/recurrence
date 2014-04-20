@@ -1,6 +1,9 @@
 package recurrence
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // A Week represents a week of the month. This is most useful in combination
 // with other entities satisfying the Schedule interface.
@@ -24,4 +27,8 @@ func weekInMonth(t time.Time) int {
 
 func isLastWeekInMonth(t time.Time) bool {
 	return t.Month() != t.AddDate(0, 0, 7).Month()
+}
+
+func (w Week) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"Week": int(w)})
 }

@@ -1,6 +1,9 @@
 package recurrence
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // A Weekday represents a day of the week. (Sunday, Monday, ...Saturday)
 type Weekday time.Weekday
@@ -21,4 +24,8 @@ func (w Weekday) IsOccurring(t time.Time) bool {
 
 func (w Weekday) Occurrences(t TimeRange) chan time.Time {
 	return t.occurrencesOfSchedule(w)
+}
+
+func (w Weekday) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"Weekday": int(w)})
 }
