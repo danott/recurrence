@@ -38,3 +38,15 @@ func assertIsOnlyOccurring(t *testing.T, r TimeRange, s Schedule, o ...string) {
 		}
 	}
 }
+
+func assertAllOccurring(t *testing.T, r TimeRange, s Schedule) {
+	for r := range r.eachDate() {
+		assertIsOccurring(t, s, r.Format(f))
+	}
+}
+
+func refuteAllOccurring(t *testing.T, r TimeRange, s Schedule) {
+	for r := range r.eachDate() {
+		refuteIsOccurring(t, s, r.Format(f))
+	}
+}
