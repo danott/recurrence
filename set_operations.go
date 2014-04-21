@@ -1,6 +1,9 @@
 package recurrence
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Computes the set intersection of a slice of Schedules.
 type Intersection []Schedule
@@ -18,6 +21,13 @@ func (i Intersection) Occurrences(t TimeRange) chan time.Time {
 	return t.occurrencesOfSchedule(i)
 }
 
+func (i Intersection) MarshalJSON() ([]byte, error) {
+	type faux Intersection
+	return json.Marshal(struct {
+		faux `json:"Intersection"`
+	}{faux: faux(i)})
+}
+
 // Computes the set union of a slice of Schedules.
 type Union []Schedule
 
@@ -32,6 +42,13 @@ func (u Union) IsOccurring(t time.Time) bool {
 
 func (u Union) Occurrences(t TimeRange) chan time.Time {
 	return t.occurrencesOfSchedule(u)
+}
+
+func (u Union) MarshalJSON() ([]byte, error) {
+	type faux Union
+	return json.Marshal(struct {
+		faux `json:"Union"`
+	}{faux: faux(u)})
 }
 
 // Computes the set difference of two Schedules.
@@ -54,4 +71,11 @@ func (d Difference) IsOccurring(t time.Time) bool {
 
 func (d Difference) Occurrences(t TimeRange) chan time.Time {
 	return t.occurrencesOfSchedule(d)
+}
+
+func (d Difference) MarshalJSON() ([]byte, error) {
+	type faux Difference
+	return json.Marshal(struct {
+		faux `json:"Difference"`
+	}{faux: faux(d)})
 }
