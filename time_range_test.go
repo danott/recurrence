@@ -9,12 +9,12 @@ func assertStartTimeAndEndTime(t *testing.T, r TimeRange, start string, end stri
 	expectedStartTime, _ := time.Parse(f, start)
 	expectedEndTime, _ := time.Parse(f, end)
 
-	if !r.start.Equal(expectedStartTime) {
-		t.Errorf("%s should have been %s", r.start, expectedStartTime)
+	if !r.Start.Equal(expectedStartTime) {
+		t.Errorf("%s should have been %s", r.Start, expectedStartTime)
 	}
 
-	if !r.end.Equal(expectedEndTime) {
-		t.Errorf("%s should have been %s", r.end, expectedEndTime)
+	if !r.End.Equal(expectedEndTime) {
+		t.Errorf("%s should have been %s", r.End, expectedEndTime)
 	}
 }
 

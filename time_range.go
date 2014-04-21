@@ -7,12 +7,12 @@ import (
 
 // A TimeRange represents a range of time, with a start and an end.
 type TimeRange struct {
-	start time.Time
-	end   time.Time
+	Start time.Time
+	End   time.Time
 }
 
 func (r TimeRange) IsOccurring(t time.Time) bool {
-	return !(t.Before(r.start) || t.After(r.end))
+	return !(t.Before(r.Start) || t.After(r.End))
 }
 
 // Generate a TimeRange representing the entire year.
@@ -67,7 +67,7 @@ func (r TimeRange) eachDate() chan time.Time {
 	c := make(chan time.Time)
 
 	go func() {
-		for t := r.start; !t.After(r.end); t = t.AddDate(0, 0, 1) {
+		for t := r.Start; !t.After(r.End); t = t.AddDate(0, 0, 1) {
 			c <- t
 		}
 		close(c)
