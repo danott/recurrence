@@ -27,5 +27,5 @@ func (w Weekday) Occurrences(t TimeRange) chan time.Time {
 }
 
 func (w Weekday) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"Weekday": int(w)})
+	return json.Marshal(map[string]interface{}{"weekday": int(w)})
 }

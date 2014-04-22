@@ -7,8 +7,8 @@ import (
 
 // Computes the set difference of two Schedules.
 type Exclusion struct {
-	Schedule Schedule
-	Exclude  Schedule
+	Schedule Schedule `json:"schedule"`
+	Exclude  Schedule `json:"exclude"`
 }
 
 func (d Exclusion) IsOccurring(t time.Time) bool {
@@ -30,6 +30,6 @@ func (d Exclusion) Occurrences(t TimeRange) chan time.Time {
 func (d Exclusion) MarshalJSON() ([]byte, error) {
 	type faux Exclusion
 	return json.Marshal(struct {
-		faux `json:"Exclusion"`
+		faux `json:"exclusion"`
 	}{faux: faux(d)})
 }

@@ -30,5 +30,5 @@ func isLastWeekInMonth(t time.Time) bool {
 }
 
 func (w Week) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"Week": int(w)})
+	return json.Marshal(map[string]interface{}{"week": int(w)})
 }

@@ -1,6 +1,8 @@
 package recurrence
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -74,4 +76,35 @@ func (r TimeRange) eachDate() chan time.Time {
 	}()
 
 	return c
+}
+
+func (self *TimeRange) UnmarshalJSON(b []byte) (err error) {
+	var mixed interface{}
+
+	err = json.Unmarshal(b, &mixed)
+	if err != nil {
+		return err
+	}
+
+	value, ok := mixed.(map[string]interface{})["start"]
+	if !ok {
+		return errors.New("start wasn't present")
+	}
+	t, err := time.Parse("2006-01-02", value.(string))
+	if err != nil {
+		return err
+	}
+	self.Start = t
+
+	value, ok = mixed.(map[string]interface{})["end"]
+	if !ok {
+		return errors.New("end wasn't present")
+	}
+	t, err = time.Parse("2006-01-02", value.(string))
+	if err != nil {
+		return err
+	}
+	self.End = t
+
+	return
 }

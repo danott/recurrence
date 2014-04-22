@@ -24,6 +24,6 @@ func (i Intersection) Occurrences(t TimeRange) chan time.Time {
 func (i Intersection) MarshalJSON() ([]byte, error) {
 	type faux Intersection
 	return json.Marshal(struct {
-		faux `json:"Intersection"`
+		faux `json:"intersection"`
 	}{faux: faux(i)})
 }

@@ -24,6 +24,6 @@ func (u Union) Occurrences(t TimeRange) chan time.Time {
 func (u Union) MarshalJSON() ([]byte, error) {
 	type faux Union
 	return json.Marshal(struct {
-		faux `json:"Union"`
+		faux `json:"union"`
 	}{faux: faux(u)})
 }

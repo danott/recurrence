@@ -25,5 +25,5 @@ func isLastDayInMonth(t time.Time) bool {
 }
 
 func (d Day) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"Day": int(d)})
+	return json.Marshal(map[string]interface{}{"day": int(d)})
 }

@@ -17,5 +17,5 @@ func (y Year) Occurrences(t TimeRange) chan time.Time {
 }
 
 func (y Year) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"Year": int(y)})
+	return json.Marshal(map[string]interface{}{"year": int(y)})
 }
