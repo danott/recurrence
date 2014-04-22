@@ -2,7 +2,7 @@ package recurrence
 
 import (
 	"encoding/json"
-	"io"
+	"fmt"
 	"time"
 )
 
@@ -14,51 +14,68 @@ type Schedule interface {
 	Occurrences(TimeRange) chan time.Time
 }
 
-func ScheduleFromJSON(r io.Reader) Schedule {
+func UnmarshalJSON(b []byte) (schedule Schedule) {
 	var mixed interface{}
-	var s Schedule
-	decoder := json.NewDecoder(r)
-	if err := decoder.Decode(&mixed); err != nil {
-		panic("Decoding err'd")
+
+	if err := json.Unmarshal(b, &mixed); err != nil {
+		panic("Schedule could not be unmarshalled from bytes")
 	} else {
-		scheduleKeyToValue(mixed, &s)
+		schedule = UnmarshalRawMap(mixed)
 	}
 
-	return s
+	return schedule
 }
 
 // http://stackoverflow.com/questions/13364181/how-to-unmarshall-an-array-of-different-types-correctly
-func scheduleKeyToValue(raw interface{}, schedule *Schedule) {
+func UnmarshalRawMap(raw interface{}) (schedule Schedule) {
 	for k, v := range raw.(map[string]interface{}) {
 		switch k {
 		case "Day":
-			*schedule = Day(v.(float64))
+			schedule = Day(v.(float64))
 		case "Weekday":
-			*schedule = Weekday(v.(float64))
+			schedule = Weekday(v.(float64))
 		case "Month":
-			*schedule = Month(v.(float64))
+			schedule = Month(v.(float64))
 		case "Week":
-			*schedule = Week(v.(float64))
+			schedule = Week(v.(float64))
 		case "Year":
-			*schedule = Year(v.(float64))
+			schedule = Year(v.(float64))
 		case "Intersection":
-			var i Intersection
+			var intersection Intersection
 			for _, v := range v.([]interface{}) {
-				var s Schedule
-				scheduleKeyToValue(v, &s)
-				i = append(i, s)
+				var member Schedule
+				member = UnmarshalRawMap(v)
+				intersection = append(intersection, member)
 			}
-			*schedule = i
+			schedule = intersection
 		case "Union":
-			var u Union
+			var union Union
 			for _, v := range v.([]interface{}) {
-				var s Schedule
-				scheduleKeyToValue(v, &s)
-				u = append(u, s)
+				var member Schedule
+				member = UnmarshalRawMap(v)
+				union = append(union, member)
 			}
-			*schedule = u
+			schedule = union
+		case "Exclusion":
+			var exclusion Exclusion
+			for k, v := range v.(map[string]interface{}) {
+				switch k {
+				case "Schedule":
+					var included Schedule
+					included = UnmarshalRawMap(v)
+					exclusion.Schedule = included
+				case "Exclude":
+					var excluded Schedule
+					excluded = UnmarshalRawMap(v)
+					exclusion.Exclude = excluded
+				default:
+					panic("Exclusion only accepts keys 'Exclude' and 'Schedule'")
+				}
+				schedule = exclusion
+			}
 		default:
-			panic("!")
+			panic(fmt.Sprintf("Unknown Schedule type: %v", k))
 		}
 	}
+	return
 }
