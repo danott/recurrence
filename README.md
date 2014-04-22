@@ -67,12 +67,12 @@ Union is a slice of Schedules. `IsOccurring` is satisfied if any member of the s
 weekends := recurrence.Union{Saturday, Sunday}
 ```
 
-### Difference
+### Exclusion
 
-Difference computes the set difference between two schedules.
+Exclusion computes the set difference between two schedules.
 
 ```go
-the_last_day_of_every_mont_except_september := recurrence.Difference{
+the_last_day_of_every_month_except_september := recurrence.Exclusion{
    Day(Last),
    September,
 }

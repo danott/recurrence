@@ -28,8 +28,8 @@ func TestIntersection(t *testing.T) {
 		"2006-01-22", "2006-01-29")
 }
 
-func TestDifference(t *testing.T) {
-	d := Difference{
+func TestExclusion(t *testing.T) {
+	d := Exclusion{
 		Day(Last),
 		Union{September, November},
 	}

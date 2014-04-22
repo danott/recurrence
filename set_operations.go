@@ -52,30 +52,30 @@ func (u Union) MarshalJSON() ([]byte, error) {
 }
 
 // Computes the set difference of two Schedules.
-type Difference struct {
-	Included Schedule
-	Excluded Schedule
+type Exclusion struct {
+	Schedule Schedule
+	Exclude  Schedule
 }
 
-func (d Difference) IsOccurring(t time.Time) bool {
-	if d.Excluded.IsOccurring(t) {
+func (d Exclusion) IsOccurring(t time.Time) bool {
+	if d.Exclude.IsOccurring(t) {
 		return false
 	}
 
-	if d.Included.IsOccurring(t) {
+	if d.Schedule.IsOccurring(t) {
 		return true
 	}
 
 	return false
 }
 
-func (d Difference) Occurrences(t TimeRange) chan time.Time {
+func (d Exclusion) Occurrences(t TimeRange) chan time.Time {
 	return t.occurrencesOfSchedule(d)
 }
 
-func (d Difference) MarshalJSON() ([]byte, error) {
-	type faux Difference
+func (d Exclusion) MarshalJSON() ([]byte, error) {
+	type faux Exclusion
 	return json.Marshal(struct {
-		faux `json:"Difference"`
+		faux `json:"Exclusion"`
 	}{faux: faux(d)})
 }
