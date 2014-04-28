@@ -7,23 +7,27 @@ import (
 	"time"
 )
 
-type ScheduleStruct struct {
+// AnySchedule acts as a wrapper around...any schedule. Why does this exists?
+// Since the tree of Schedules is an arbitrary relationship of interfaces, we
+// need a struct to *easily* marshal/unmarshal json of the entire schedule
+// hierarchy.
+type AnySchedule struct {
 	Schedule `json:"schedule"`
 }
 
-func (self ScheduleStruct) IsOccurring(t time.Time) bool {
+func (self AnySchedule) IsOccurring(t time.Time) bool {
 	return self.Schedule.IsOccurring(t)
 }
 
-func (self ScheduleStruct) Occurrences(t TimeRange) chan time.Time {
+func (self AnySchedule) Occurrences(t TimeRange) chan time.Time {
 	return self.Schedule.Occurrences(t)
 }
 
-func (d ScheduleStruct) MarshalJSON() ([]byte, error) {
+func (d AnySchedule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.Schedule)
 }
 
-func (self *ScheduleStruct) UnmarshalJSON(b []byte) (err error) {
+func (self *AnySchedule) UnmarshalJSON(b []byte) (err error) {
 	var mixed interface{}
 
 	err = json.Unmarshal(b, &mixed)
