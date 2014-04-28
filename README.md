@@ -17,9 +17,9 @@ The `Schedule` interface is the foundation of the recurrence package. By using a
 Integer day of the month, 1 through 31, or the constant `Last`.
 
 ```go
-first := Day(First) // Day(1)
-last := Day(Last)
-twentieth := Day(20)
+first := recurrence.Day(First)
+last := recurrence.Day(Last)
+twentieth := recurrence.Day(20)
 ```
 
 ## Week
@@ -27,9 +27,9 @@ twentieth := Day(20)
 Integer week of the month, 1 through 5, or the constant `Last`.
 
 ```go
-first := Week(First) // Week(1)
-last := Week(Last)
-third := Week(Third) // Week(3)
+first := recurrence.Week(First)
+last := recurrence.Week(Last)
+third := recurrence.Week(Third)
 ```
 
 ## Weekday
@@ -37,7 +37,7 @@ third := Week(Third) // Week(3)
 Day of the week, Sunday through Monday. Constants are defined so you can use them with ease.
 
 ```go
-Sunday.IsOccurring(time.Now())
+recurrence.Sunday.IsOccurring(time.Now())
 ```
 
 ## Month
@@ -45,7 +45,7 @@ Sunday.IsOccurring(time.Now())
 A month of the year. Constants are defined to be used with ease.
 
 ```go
-January.IsOccurring(time.Now())
+recurrence.January.IsOccurring(time.Now())
 ```
 
 ## Set Operations
@@ -56,7 +56,7 @@ Intersection is a slice of Schedules. `IsOccurring` is only satisfied if all mem
 
 ```go
 // Complex Rules
-american_thanksgiving := recurrence.Intersection{Week(4), Thursday, November}
+american_thanksgiving := recurrence.Intersection{recurrence.Week(4), recurrence.Thursday, recurrence.November}
 ```
 
 ### Union
@@ -64,7 +64,7 @@ american_thanksgiving := recurrence.Intersection{Week(4), Thursday, November}
 Union is a slice of Schedules. `IsOccurring` is satisfied if any member of the slice is occurring. (Set union).
 
 ```go
-weekends := recurrence.Union{Saturday, Sunday}
+weekends := recurrence.Union{recurrence.Saturday, recurrence.Sunday}
 ```
 
 ### Exclusion
@@ -72,9 +72,9 @@ weekends := recurrence.Union{Saturday, Sunday}
 Exclusion computes the set difference between two schedules.
 
 ```go
-the_last_day_of_every_month_except_september := recurrence.Exclusion{
-   Day(Last),
-   September,
+every_friday_except_the_last := recurrence.Exclusion{
+  Schedule: recurrence.Friday,
+  Exclude: recurrence.Week(recurrence.Last)
 }
 ```
 
