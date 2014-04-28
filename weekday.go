@@ -18,14 +18,14 @@ const (
 	Saturday
 )
 
-func (w Weekday) IsOccurring(t time.Time) bool {
-	return t.Weekday() == time.Weekday(w)
+func (self Weekday) IsOccurring(t time.Time) bool {
+	return t.Weekday() == time.Weekday(self)
 }
 
-func (w Weekday) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(w)
+func (self Weekday) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
-func (w Weekday) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"weekday": int(w)})
+func (self Weekday) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"weekday": int(self)})
 }

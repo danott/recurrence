@@ -12,8 +12,8 @@ type TimeRange struct {
 	End   time.Time
 }
 
-func (r TimeRange) IsOccurring(t time.Time) bool {
-	return !(t.Before(r.Start) || t.After(r.End))
+func (self TimeRange) IsOccurring(t time.Time) bool {
+	return !(t.Before(self.Start) || t.After(self.End))
 }
 
 // Generate a TimeRange representing the entire year.
@@ -45,15 +45,15 @@ func MonthRange(month interface{}, year int) TimeRange {
 	}
 }
 
-func (t TimeRange) Occurrences(other TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(other)
+func (self TimeRange) Occurrences(other TimeRange) chan time.Time {
+	return self.occurrencesOfSchedule(other)
 }
 
-func (t TimeRange) occurrencesOfSchedule(s Schedule) chan time.Time {
+func (self TimeRange) occurrencesOfSchedule(s Schedule) chan time.Time {
 	c := make(chan time.Time)
 
 	go func() {
-		for t := range t.eachDate() {
+		for t := range self.eachDate() {
 			if s.IsOccurring(t) {
 				c <- t
 			}
@@ -64,11 +64,11 @@ func (t TimeRange) occurrencesOfSchedule(s Schedule) chan time.Time {
 	return c
 }
 
-func (r TimeRange) eachDate() chan time.Time {
+func (self TimeRange) eachDate() chan time.Time {
 	c := make(chan time.Time)
 
 	go func() {
-		for t := beginningOfDay(r.Start); !t.After(r.End); t = t.AddDate(0, 0, 1) {
+		for t := beginningOfDay(self.Start); !t.After(self.End); t = t.AddDate(0, 0, 1) {
 			c <- t
 		}
 		close(c)

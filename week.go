@@ -9,16 +9,16 @@ import (
 // with other entities satisfying the Schedule interface.
 type Week int
 
-func (w Week) IsOccurring(t time.Time) bool {
-	if w := int(w); w == Last {
+func (self Week) IsOccurring(t time.Time) bool {
+	if weekInt := int(self); weekInt == Last {
 		return isLastWeekInMonth(t)
 	} else {
-		return weekInMonth(t) == w
+		return weekInMonth(t) == weekInt
 	}
 }
 
-func (w Week) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(w)
+func (self Week) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
 func weekInMonth(t time.Time) int {
@@ -29,6 +29,6 @@ func isLastWeekInMonth(t time.Time) bool {
 	return t.Month() != t.AddDate(0, 0, 7).Month()
 }
 
-func (w Week) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"week": int(w)})
+func (self Week) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"week": int(self)})
 }

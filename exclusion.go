@@ -11,25 +11,25 @@ type Exclusion struct {
 	Exclude  Schedule `json:"exclude"`
 }
 
-func (d Exclusion) IsOccurring(t time.Time) bool {
-	if d.Exclude.IsOccurring(t) {
+func (self Exclusion) IsOccurring(t time.Time) bool {
+	if self.Exclude.IsOccurring(t) {
 		return false
 	}
 
-	if d.Schedule.IsOccurring(t) {
+	if self.Schedule.IsOccurring(t) {
 		return true
 	}
 
 	return false
 }
 
-func (d Exclusion) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(d)
+func (self Exclusion) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
-func (d Exclusion) MarshalJSON() ([]byte, error) {
+func (self Exclusion) MarshalJSON() ([]byte, error) {
 	type faux Exclusion
 	return json.Marshal(struct {
 		faux `json:"exclusion"`
-	}{faux: faux(d)})
+	}{faux: faux(self)})
 }

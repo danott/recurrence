@@ -8,14 +8,14 @@ import (
 // Represents a year.
 type Year int
 
-func (y Year) IsOccurring(t time.Time) bool {
-	return t.Year() == int(y)
+func (self Year) IsOccurring(t time.Time) bool {
+	return t.Year() == int(self)
 }
 
-func (y Year) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(y)
+func (self Year) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
-func (y Year) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"year": int(y)})
+func (self Year) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"year": int(self)})
 }

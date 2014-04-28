@@ -8,22 +8,22 @@ import (
 // A Day specifies a day of the month. (1, 2, 3, ...31)
 type Day int
 
-func (d Day) IsOccurring(t time.Time) bool {
-	if d := int(d); d == Last {
+func (self Day) IsOccurring(t time.Time) bool {
+	if self := int(self); self == Last {
 		return isLastDayInMonth(t)
 	} else {
-		return d == t.Day()
+		return self == t.Day()
 	}
 }
 
-func (d Day) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(d)
+func (self Day) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
 func isLastDayInMonth(t time.Time) bool {
 	return t.Month() != t.AddDate(0, 0, 1).Month()
 }
 
-func (d Day) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"day": int(d)})
+func (self Day) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"day": int(self)})
 }

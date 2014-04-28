@@ -8,8 +8,8 @@ import (
 // Computes the set union of a slice of Schedules.
 type Union []Schedule
 
-func (u Union) IsOccurring(t time.Time) bool {
-	for _, r := range u {
+func (self Union) IsOccurring(t time.Time) bool {
+	for _, r := range self {
 		if r.IsOccurring(t) {
 			return true
 		}
@@ -17,13 +17,13 @@ func (u Union) IsOccurring(t time.Time) bool {
 	return false
 }
 
-func (u Union) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(u)
+func (self Union) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
-func (u Union) MarshalJSON() ([]byte, error) {
+func (self Union) MarshalJSON() ([]byte, error) {
 	type faux Union
 	return json.Marshal(struct {
 		faux `json:"union"`
-	}{faux: faux(u)})
+	}{faux: faux(self)})
 }

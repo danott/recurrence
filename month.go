@@ -23,14 +23,14 @@ const (
 	December
 )
 
-func (m Month) IsOccurring(t time.Time) bool {
-	return t.Month() == time.Month(m)
+func (self Month) IsOccurring(t time.Time) bool {
+	return t.Month() == time.Month(self)
 }
 
-func (m Month) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(m)
+func (self Month) Occurrences(t TimeRange) chan time.Time {
+	return t.occurrencesOfSchedule(self)
 }
 
-func (m Month) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"month": int(m)})
+func (self Month) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"month": int(self)})
 }
