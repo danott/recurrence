@@ -68,7 +68,7 @@ func (r TimeRange) eachDate() chan time.Time {
 	c := make(chan time.Time)
 
 	go func() {
-		for t := r.Start; !t.After(r.End); t = t.AddDate(0, 0, 1) {
+		for t := beginningOfDay(r.Start); !t.After(r.End); t = t.AddDate(0, 0, 1) {
 			c <- t
 		}
 		close(c)
@@ -92,4 +92,8 @@ func (self *TimeRange) UnmarshalJSON(b []byte) error {
 	self.End = t
 
 	return err
+}
+
+func beginningOfDay(t time.Time) time.Time {
+	return t.Add(time.Hour * -12).Round(time.Hour * 24)
 }

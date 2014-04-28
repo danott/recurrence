@@ -51,3 +51,20 @@ func TestMonthRangeAcceptableArguments(t *testing.T) {
 		t.Errorf("Panicked on MonthRange tests")
 	}
 }
+
+func TestBeginningOfDay(t *testing.T) {
+	expected := time.Date(2006, 1, 2, 0, 0, 0, 0, time.UTC)
+	tests := []time.Time{
+		time.Date(2006, 1, 2, 0, 0, 0, 0, time.UTC),
+		time.Date(2006, 1, 2, 6, 0, 0, 0, time.UTC),
+		time.Date(2006, 1, 2, 12, 0, 0, 0, time.UTC),
+		time.Date(2006, 1, 2, 18, 0, 0, 0, time.UTC),
+		time.Date(2006, 1, 2, 23, 59, 59, 99, time.UTC),
+	}
+
+	for _, ti := range tests {
+		if beginningOfDay(ti) != expected {
+			t.Errorf("%s was not at beginning of day", ti)
+		}
+	}
+}
