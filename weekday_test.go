@@ -1,6 +1,9 @@
 package recurrence
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestWeekday(t *testing.T) {
 	tr := MonthRange(January, 2006)
@@ -25,4 +28,50 @@ func TestWeekday(t *testing.T) {
 
 	assertIsOnlyOccurring(t, tr, Saturday,
 		"2006-01-07", "2006-01-14", "2006-01-21", "2006-01-28")
+}
+
+func TestWeekdayMarshalJSON(t *testing.T) {
+	tests := map[string]Weekday{
+		`{"weekday":"Sunday"}`:    Sunday,
+		`{"weekday":"Monday"}`:    Monday,
+		`{"weekday":"Tuesday"}`:   Tuesday,
+		`{"weekday":"Wednesday"}`: Wednesday,
+		`{"weekday":"Thursday"}`:  Thursday,
+		`{"weekday":"Friday"}`:    Friday,
+		`{"weekday":"Saturday"}`:  Saturday,
+	}
+
+	for expected, input := range tests {
+		output, _ := json.Marshal(input)
+		if string(output) != expected {
+			t.Errorf("Expected %#v to equal %#v", string(output), expected)
+		}
+	}
+}
+
+func TestWeekdayUnmarshalJSON(t *testing.T) {
+	tests := map[string]Weekday{
+		`0`:           Sunday,
+		`1`:           Monday,
+		`2`:           Tuesday,
+		`3`:           Wednesday,
+		`4`:           Thursday,
+		`5`:           Friday,
+		`6`:           Saturday,
+		`"Sunday"`:    Sunday,
+		`"Monday"`:    Monday,
+		`"Tuesday"`:   Tuesday,
+		`"Wednesday"`: Wednesday,
+		`"Thursday"`:  Thursday,
+		`"Friday"`:    Friday,
+		`"Saturday"`:  Saturday,
+	}
+
+	for input, expected := range tests {
+		var output Weekday
+		err := json.Unmarshal([]byte(input), &output)
+		if output != expected {
+			t.Errorf("\nInput: %#v\nExpected: %#v\nActual: %#v\nError: %s", input, expected, output, err.Error())
+		}
+	}
 }

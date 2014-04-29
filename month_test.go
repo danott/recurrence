@@ -1,6 +1,9 @@
 package recurrence
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestMonth(t *testing.T) {
 	r := YearRange(2006)
@@ -100,4 +103,65 @@ func TestMonth(t *testing.T) {
 		"2006-12-18", "2006-12-19", "2006-12-20", "2006-12-21", "2006-12-22",
 		"2006-12-23", "2006-12-24", "2006-12-25", "2006-12-26", "2006-12-27",
 		"2006-12-28", "2006-12-29", "2006-12-30", "2006-12-31")
+}
+
+func TestMonthMarshalJSON(t *testing.T) {
+	tests := map[string]Month{
+		`{"month":"January"}`:   January,
+		`{"month":"February"}`:  February,
+		`{"month":"March"}`:     March,
+		`{"month":"April"}`:     April,
+		`{"month":"May"}`:       May,
+		`{"month":"June"}`:      June,
+		`{"month":"July"}`:      July,
+		`{"month":"August"}`:    August,
+		`{"month":"September"}`: September,
+		`{"month":"October"}`:   October,
+		`{"month":"November"}`:  November,
+		`{"month":"December"}`:  December,
+	}
+
+	for expected, input := range tests {
+		output, _ := json.Marshal(input)
+		if string(output) != expected {
+			t.Errorf("Expected %#v to equal %#v", string(output), expected)
+		}
+	}
+}
+
+func TestMonthUnmarshalJSON(t *testing.T) {
+	tests := map[string]Month{
+		`1`:           January,
+		`2`:           February,
+		`3`:           March,
+		`4`:           April,
+		`5`:           May,
+		`6`:           June,
+		`7`:           July,
+		`8`:           August,
+		`9`:           September,
+		`10`:          October,
+		`11`:          November,
+		`12`:          December,
+		`"January"`:   January,
+		`"February"`:  February,
+		`"March"`:     March,
+		`"April"`:     April,
+		`"May"`:       May,
+		`"June"`:      June,
+		`"July"`:      July,
+		`"August"`:    August,
+		`"September"`: September,
+		`"October"`:   October,
+		`"November"`:  November,
+		`"December"`:  December,
+	}
+
+	for input, expected := range tests {
+		var output Month
+		err := json.Unmarshal([]byte(input), &output)
+		if output != expected {
+			t.Errorf("\nInput: %#v\nExpected: %#v\nActual: %#v\nError: %s", input, expected, output, err.Error())
+		}
+	}
 }

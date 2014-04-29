@@ -1,6 +1,9 @@
 package recurrence
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestWeek(t *testing.T) {
 	tr := MonthRange(January, 2006)
@@ -22,4 +25,41 @@ func TestWeek(t *testing.T) {
 
 	assertIsOnlyOccurring(t, tr, Week(Last), "2006-01-25", "2006-01-26",
 		"2006-01-27", "2006-01-28", "2006-01-29", "2006-01-30", "2006-01-31")
+}
+
+func TestWeekMarshalJSON(t *testing.T) {
+	tests := map[string]Week{
+		`{"week":1}`:      Week(1),
+		`{"week":2}`:      Week(2),
+		`{"week":3}`:      Week(3),
+		`{"week":4}`:      Week(4),
+		`{"week":5}`:      Week(5),
+		`{"week":"Last"}`: Week(Last),
+	}
+
+	for expected, input := range tests {
+		output, _ := json.Marshal(input)
+		if string(output) != expected {
+			t.Errorf("Expected %#v to equal %#v", string(output), expected)
+		}
+	}
+}
+
+func TestWeekUnmarshalJSON(t *testing.T) {
+	tests := map[string]Week{
+		`1`:      Week(1),
+		`2`:      Week(2),
+		`3`:      Week(3),
+		`4`:      Week(4),
+		`5`:      Week(5),
+		`"Last"`: Week(Last),
+	}
+
+	for input, expected := range tests {
+		var output Week
+		err := json.Unmarshal([]byte(input), &output)
+		if output != expected {
+			t.Errorf("\nInput: %#v\nExpected: %#v\nActual: %#v\nError: %s", input, expected, output, err.Error())
+		}
+	}
 }
