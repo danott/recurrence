@@ -10,11 +10,9 @@ func TestAnyScheduleUnmarshalJSON(t *testing.T) {
 	}
 
 	for input, expected := range tests {
-		var output Schedule
-		output, _ = ScheduleUnmarshalJSON([]byte(input))
-
-		if output != expected {
-			t.Errorf("\nInput: %#v\nExpected: %#v\nActual: %#v", input, expected, output)
+		output, err := ScheduleUnmarshalJSON([]byte(input))
+		if output != expected || err != nil {
+			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
 		}
 	}
 }
