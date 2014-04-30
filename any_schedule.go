@@ -45,6 +45,10 @@ func ScheduleUnmarshalJSON(b []byte) (schedule Schedule, err error) {
 	for key, value := range mixed.(map[string]interface{}) {
 		rawValue, _ := json.Marshal(value)
 		switch key {
+		case "date":
+			var date Date
+			err = json.Unmarshal(rawValue, &date)
+			schedule = date
 		case "day":
 			var day Day
 			err = json.Unmarshal(rawValue, &day)
