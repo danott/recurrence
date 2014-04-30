@@ -3,6 +3,7 @@ package recurrence
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -39,23 +40,18 @@ func (self Week) MarshalJSON() ([]byte, error) {
 }
 
 func (self *Week) UnmarshalJSON(b []byte) error {
-	var err error
-
-	switch string(b) {
-	case `1`:
-		*self = Week(1)
-	case `2`:
-		*self = Week(2)
-	case `3`:
-		*self = Week(3)
-	case `4`:
-		*self = Week(4)
-	case `5`:
-		*self = Week(5)
+	switch s := string(b); s {
+	case `1`, `2`, `3`, `4`, `5`:
+		i, err := strconv.ParseInt(s, 10, 0)
+		if err != nil {
+			return err
+		}
+		*self = Week(i)
 	case `"Last"`:
 		*self = Week(Last)
 	default:
-		err = fmt.Errorf("Week cannot unmarshal %s", b)
+		return fmt.Errorf("Week cannot unmarshal %s", b)
 	}
-	return err
+
+	return nil
 }

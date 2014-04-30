@@ -2,7 +2,6 @@ package recurrence
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 )
@@ -12,7 +11,7 @@ import (
 // need a struct to *easily* marshal/unmarshal json of the entire schedule
 // hierarchy.
 type AnySchedule struct {
-	Schedule `json:"schedule"`
+	Schedule Schedule
 }
 
 func (self AnySchedule) IsOccurring(t time.Time) bool {
@@ -27,82 +26,56 @@ func (d AnySchedule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.Schedule)
 }
 
-func (self *AnySchedule) UnmarshalJSON(b []byte) (err error) {
-	var mixed interface{}
+func (self *AnySchedule) UnmarshalJSON(b []byte) error {
+	schedule, err := ScheduleUnmarshalJSON(b)
 
-	err = json.Unmarshal(b, &mixed)
 	if err != nil {
 		return err
 	} else {
-		self.Schedule = unmarshalRawMap(mixed)
-		if self.Schedule == nil {
-			self.Schedule = Day(Never)
-		}
+		self.Schedule = schedule
 	}
 
-	return
+	return nil
 }
 
-// http://stackoverflow.com/questions/13364181/how-to-unmarshall-an-array-of-different-types-correctly
-func unmarshalRawMap(raw interface{}) (schedule Schedule) {
-	for k, v := range raw.(map[string]interface{}) {
-		switch k {
+func ScheduleUnmarshalJSON(b []byte) (schedule Schedule, err error) {
+	var mixed interface{}
+	json.Unmarshal(b, &mixed)
+
+	for key, value := range mixed.(map[string]interface{}) {
+		rawValue, _ := json.Marshal(value)
+		switch key {
 		case "day":
-			schedule = Day(v.(float64))
-		case "weekday":
-			schedule = Weekday(v.(float64))
-		case "month":
-			schedule = Month(v.(float64))
-		case "week":
-			schedule = Week(v.(float64))
-		case "year":
-			schedule = Year(v.(float64))
+			var day Day
+			err = json.Unmarshal(rawValue, &day)
+			schedule = day
 		case "intersection":
 			var intersection Intersection
-			for _, v := range v.([]interface{}) {
-				var member Schedule
-				member = unmarshalRawMap(v)
-				intersection = append(intersection, member)
-			}
+			err = json.Unmarshal(rawValue, &intersection)
 			schedule = intersection
+		case "month":
+			var month Month
+			err = json.Unmarshal(rawValue, &month)
+			schedule = month
 		case "union":
 			var union Union
-			for _, v := range v.([]interface{}) {
-				var member Schedule
-				member = unmarshalRawMap(v)
-				union = append(union, member)
-			}
+			err = json.Unmarshal(rawValue, &union)
 			schedule = union
-		case "exclusion":
-			var exclusion Exclusion
-			for k, v := range v.(map[string]interface{}) {
-				switch k {
-				case "schedule":
-					var included Schedule
-					included = unmarshalRawMap(v)
-					exclusion.Schedule = included
-				case "exclude":
-					var excluded Schedule
-					excluded = unmarshalRawMap(v)
-					exclusion.Exclude = excluded
-				default:
-					panic("exclusion json only accepts 'exclude' and 'schedule' keys")
-				}
-			}
-			if exclusion.Schedule == nil {
-				panic(errors.New("exclusion json requires 'schedule' key"))
-			}
-			if exclusion.Exclude == nil {
-				panic(errors.New("exclusion json requires 'exclude' key"))
-			}
-			schedule = exclusion
+		case "week":
+			var week Week
+			err = json.Unmarshal(rawValue, &week)
+			schedule = week
+		case "weekday":
+			var weekday Weekday
+			err = json.Unmarshal(rawValue, &weekday)
+			schedule = weekday
+		case "year":
+			var year Year
+			err = json.Unmarshal(rawValue, &year)
+			schedule = year
 		default:
-			panic(fmt.Sprintf("Unacceptable Schedule type: %v", k))
+			err = fmt.Errorf("%s is not a recognized schedule", key)
 		}
-	}
-
-	if schedule == nil {
-		schedule = Day(Never)
 	}
 	return
 }

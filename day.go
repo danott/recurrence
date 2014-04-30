@@ -35,22 +35,23 @@ func (self Day) MarshalJSON() ([]byte, error) {
 }
 
 func (self *Day) UnmarshalJSON(b []byte) error {
-	var err error
-
 	s := string(b)
+
 	i, err := strconv.ParseInt(s, 10, 0)
+
 	if err != nil {
-		if s == `"Last"` {
-			*self = Day(Last)
+		if s != `"Last"` {
+			return fmt.Errorf("day cannot unmarshal %s", b)
 		} else {
-			err = fmt.Errorf("Day cannot unmarshal %s", b)
+			*self = Day(Last)
 		}
 	} else {
-		if 0 < i || i > 31 {
-			*self = Day(i)
+		if i < 1 || i > 31 {
+			return fmt.Errorf("day must be 1-31. Was %#v", i)
 		} else {
-			err = fmt.Errorf("Day must be 1-31. Was %#v", i)
+			*self = Day(i)
 		}
 	}
-	return err
+
+	return nil
 }

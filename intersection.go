@@ -2,6 +2,7 @@ package recurrence
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -14,6 +15,7 @@ func (self Intersection) IsOccurring(t time.Time) bool {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -26,4 +28,26 @@ func (self Intersection) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		faux `json:"intersection"`
 	}{faux: faux(self)})
+}
+
+func (self *Intersection) UnmarshalJSON(b []byte) error {
+	var mixed interface{}
+
+	json.Unmarshal(b, &mixed)
+
+	switch mixed.(type) {
+	case []interface{}:
+		for _, value := range mixed.([]interface{}) {
+			bytes, _ := json.Marshal(value)
+			schedule, err := ScheduleUnmarshalJSON(bytes)
+			if err != nil {
+				return err
+			}
+			*self = append(*self, schedule)
+		}
+	default:
+		return fmt.Errorf("intersection must be a slice")
+	}
+
+	return nil
 }

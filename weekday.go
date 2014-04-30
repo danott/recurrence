@@ -28,8 +28,6 @@ func (self Weekday) Occurrences(t TimeRange) chan time.Time {
 }
 
 func (self *Weekday) UnmarshalJSON(b []byte) error {
-	var err error
-
 	switch string(b) {
 	case `0`, `"Sunday"`:
 		*self = Sunday
@@ -46,10 +44,10 @@ func (self *Weekday) UnmarshalJSON(b []byte) error {
 	case `6`, `"Saturday"`:
 		*self = Saturday
 	default:
-		*self = -1
-		err = fmt.Errorf("Weekday cannot unmarshal %s", b)
+		return fmt.Errorf("Weekday cannot unmarshal %s", b)
 	}
-	return err
+
+	return nil
 }
 
 func (self Weekday) MarshalJSON() ([]byte, error) {

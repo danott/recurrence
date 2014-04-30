@@ -37,8 +37,6 @@ func (self Month) MarshalJSON() ([]byte, error) {
 }
 
 func (self *Month) UnmarshalJSON(b []byte) error {
-	var err error
-
 	switch string(b) {
 	case `1`, `"January"`:
 		*self = January
@@ -65,8 +63,8 @@ func (self *Month) UnmarshalJSON(b []byte) error {
 	case `12`, `"December"`:
 		*self = December
 	default:
-		*self = 0
-		err = fmt.Errorf("Weekday cannot unmarshal %s", b)
+		return fmt.Errorf("Weekday cannot unmarshal %s", b)
 	}
-	return err
+
+	return nil
 }

@@ -16,35 +16,6 @@ func (self TimeRange) IsOccurring(t time.Time) bool {
 	return !(t.Before(self.Start) || t.After(self.End))
 }
 
-// Generate a TimeRange representing the entire year.
-func YearRange(y int) TimeRange {
-	return TimeRange{
-		time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC),
-		time.Date(y+1, time.January, 0, 0, 0, 0, 0, time.UTC),
-	}
-}
-
-// Generate a TimeRange representing a specific month.
-func MonthRange(month interface{}, year int) TimeRange {
-	var m time.Month
-
-	switch t := month.(type) {
-	case int:
-		m = time.Month(t)
-	case Month:
-		m = time.Month(t)
-	case time.Month:
-		m = t
-	default:
-		panic(fmt.Sprintf("MonthRange can't use %T", month))
-	}
-
-	return TimeRange{
-		time.Date(year, m, 1, 0, 0, 0, 0, time.UTC),
-		time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC),
-	}
-}
-
 func (self TimeRange) Occurrences(other TimeRange) chan time.Time {
 	return self.occurrencesOfSchedule(other)
 }
@@ -96,4 +67,33 @@ func (self *TimeRange) UnmarshalJSON(b []byte) error {
 
 func beginningOfDay(t time.Time) time.Time {
 	return t.Add(time.Hour * -12).Round(time.Hour * 24)
+}
+
+// Generate a TimeRange representing the entire year.
+func YearRange(y int) TimeRange {
+	return TimeRange{
+		time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(y+1, time.January, 0, 0, 0, 0, 0, time.UTC),
+	}
+}
+
+// Generate a TimeRange representing a specific month.
+func MonthRange(month interface{}, year int) TimeRange {
+	var m time.Month
+
+	switch t := month.(type) {
+	case int:
+		m = time.Month(t)
+	case Month:
+		m = time.Month(t)
+	case time.Month:
+		m = t
+	default:
+		panic(fmt.Sprintf("MonthRange can't use %T", month))
+	}
+
+	return TimeRange{
+		time.Date(year, m, 1, 0, 0, 0, 0, time.UTC),
+		time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC),
+	}
 }

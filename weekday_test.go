@@ -42,9 +42,9 @@ func TestWeekdayMarshalJSON(t *testing.T) {
 	}
 
 	for expected, input := range tests {
-		output, _ := json.Marshal(input)
-		if string(output) != expected {
-			t.Errorf("Expected %#v to equal %#v", string(output), expected)
+		output, err := json.Marshal(input)
+		if string(output) != expected || err != nil {
+			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
 		}
 	}
 }
@@ -70,8 +70,8 @@ func TestWeekdayUnmarshalJSON(t *testing.T) {
 	for input, expected := range tests {
 		var output Weekday
 		err := json.Unmarshal([]byte(input), &output)
-		if output != expected {
-			t.Errorf("\nInput: %#v\nExpected: %#v\nActual: %#v\nError: %s", input, expected, output, err.Error())
+		if output != expected || err != nil {
+			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
 		}
 	}
 }
