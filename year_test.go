@@ -3,7 +3,6 @@ package recurrence
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"testing"
 	"time"
@@ -32,9 +31,19 @@ func TestYearOccurrences(t *testing.T) {
 		dates = append(dates, d)
 	}
 
-	log.Println(dates)
 	if l := len(dates); l != 365 {
 		t.Errorf("You're doing it wrong. Expected 365. Got %d", l)
+	}
+
+	tr = TimeRange{time.Time(NewDate("2525-12-31")), time.Time(NewDate("3000-01-01"))}
+	dates = make([]time.Time, 0)
+
+	for d := range y.Occurrences(tr) {
+		dates = append(dates, d)
+	}
+
+	if l := len(dates); l != 1 {
+		t.Errorf("You're doing it wrong. Expected 1. Got %d", l)
 	}
 }
 
