@@ -26,6 +26,14 @@ func isLastDayInMonth(t time.Time) bool {
 	return t.Month() != t.AddDate(0, 0, 1).Month()
 }
 
+func lastDayOfMonth(t time.Time) time.Time {
+	return firstDayOfMonth(t).AddDate(0, 1, -1)
+}
+
+func firstDayOfMonth(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
+}
+
 func (self Day) MarshalJSON() ([]byte, error) {
 	if int(self) == Last {
 		return json.Marshal(map[string]interface{}{"day": "Last"})

@@ -28,6 +28,21 @@ func TestWeek(t *testing.T) {
 		"2006-01-27", "2006-01-28", "2006-01-29", "2006-01-30", "2006-01-31")
 }
 
+func TestWeekOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2006-12-31"))}
+
+	expectations := map[Schedule]int{
+		Week(1):    84,
+		Week(2):    84,
+		Week(3):    84,
+		Week(4):    84,
+		Week(5):    29,
+		Week(Last): 84,
+	}
+
+	assertOccurrenceGeneration(t, tr, expectations)
+}
+
 func TestWeekMarshalJSON(t *testing.T) {
 	tests := map[string]Week{
 		`{"week":1}`:      Week(1),
@@ -66,10 +81,17 @@ func TestWeekUnmarshalJSON(t *testing.T) {
 }
 
 func BenchmarkWeekOccurrences(b *testing.B) {
-	d := Week(First)
 	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	var w Week
 	for n := 0; n < b.N; n++ {
-		ch := d.Occurrences(tr)
+		run := n % 6
+		if run == 0 {
+			w = Week(Last)
+		} else {
+			w = Week(run)
+		}
+
+		ch := w.Occurrences(tr)
 		for {
 			_, ok := <-ch
 

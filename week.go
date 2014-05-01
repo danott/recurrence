@@ -19,8 +19,120 @@ func (self Week) IsOccurring(t time.Time) bool {
 	}
 }
 
-func (self Week) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(self)
+func (self Week) Occurrences(tr TimeRange) chan time.Time {
+	ch := make(chan time.Time)
+
+	go func() {
+		start := tr.Start.AddDate(0, 0, -1)
+		end := tr.End
+		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
+			ch <- t
+		}
+		close(ch)
+	}()
+
+	return ch
+}
+
+func (self Week) String() string {
+	switch int(self) {
+	case 1:
+		return "(First Week)"
+	case 2:
+		return "(Second Week)"
+	case 3:
+		return "(Third Week)"
+	case 4:
+		return "(Fourth Week)"
+	case 5:
+		return "(Fifth Week)"
+	case Last:
+		return "(Last Week)"
+	default:
+		return "(Never Week)"
+	}
+}
+
+func (self Week) NextAfter(t time.Time) (time.Time, error) {
+	desiredWeek := int(self)
+
+	if desiredWeek == 1 {
+		if t.Day() < 7 || isLastDayInMonth(t) {
+			return t.AddDate(0, 0, 1), nil
+		}
+
+		return firstDayOfMonth(t).AddDate(0, 1, 0), nil
+	}
+
+	if desiredWeek == 2 {
+		if t.Day() < 7 {
+			return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, 7), nil
+		}
+
+		if t.Day() > 13 {
+			return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 7), nil
+		}
+
+		return t.AddDate(0, 0, 1), nil
+	}
+
+	if desiredWeek == 3 {
+		if t.Day() < 14 {
+			return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, 14), nil
+		}
+
+		if t.Day() > 20 {
+			return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 14), nil
+		}
+
+		return t.AddDate(0, 0, 1), nil
+	}
+
+	if desiredWeek == 4 {
+		if t.Day() < 21 {
+			return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, 21), nil
+		}
+
+		if t.Day() > 27 {
+			return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).AddDate(0, 1, 21), nil
+		}
+
+		return t.AddDate(0, 0, 1), nil
+	}
+
+	if desiredWeek == 5 {
+		totalDaysInMonth := lastDayOfMonth(t).Day()
+
+		if totalDaysInMonth < 29 {
+			return self.NextAfter(t.AddDate(0, 1, 0))
+		}
+
+		if isLastDayInMonth(t) {
+			return self.NextAfter(t.AddDate(0, 0, 1))
+		}
+
+		if t.Day() < 27 {
+			return firstDayOfMonth(t).AddDate(0, 0, 28), nil
+		}
+
+		return t.AddDate(0, 0, 1), nil
+	}
+
+	if desiredWeek == Last {
+		totalDaysInMonth := lastDayOfMonth(t).Day()
+
+		if isLastDayInMonth(t) {
+			return self.NextAfter(t.AddDate(0, 0, 1))
+		}
+
+		if t.Day() < totalDaysInMonth-7 {
+			return lastDayOfMonth(t).AddDate(0, 0, -6), nil
+		}
+
+		return t.AddDate(0, 0, 1), nil
+	}
+
+	return t, fmt.Errorf("You should never get here.")
 }
 
 func weekInMonth(t time.Time) int {
