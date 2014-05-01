@@ -44,6 +44,7 @@ func TestDayOccurrences(t *testing.T) {
 
 	assertOccurrenceGeneration(t, tr, expectations)
 }
+
 func TestDayMarshalJSON(t *testing.T) {
 	tests := map[string]Day{
 		`{"day":1}`:      Day(1),

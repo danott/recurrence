@@ -20,7 +20,27 @@ func (self Union) IsOccurring(t time.Time) bool {
 }
 
 func (self Union) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(self)
+	ch := make(chan time.Time)
+	done := make(chan bool, len(self))
+
+	for _, schedule := range self {
+		go func(schedule Schedule) {
+			for t := range schedule.Occurrences(t) {
+				ch <- t
+			}
+			done <- true
+		}(schedule)
+	}
+
+	go func() {
+		for i := 0; i < len(self); i++ {
+			<-done
+		}
+		close(ch)
+		close(done)
+	}()
+
+	return ch
 }
 
 func (self Union) MarshalJSON() ([]byte, error) {

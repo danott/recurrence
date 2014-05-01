@@ -22,6 +22,17 @@ func TestUnion(t *testing.T) {
 		"2006-12-31")
 }
 
+func TestUnionOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[int]Schedule{
+		368: Union{June, July, August},
+		626: Union{Monday, Wednesday, Friday},
+	}
+
+	assertOccurrenceGeneration2(t, tr, expectations)
+}
+
 func TestUnionMarshalJSON(t *testing.T) {
 	tests := map[string]Union{
 		`{"union":[{"day":1},{"day":"Last"},{"month":"January"}]}`:         Union{Day(First), Day(Last), January},
