@@ -18,8 +18,57 @@ func (self Day) IsOccurring(t time.Time) bool {
 	}
 }
 
-func (self Day) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(self)
+func (self Day) Occurrences(tr TimeRange) chan time.Time {
+	ch := make(chan time.Time)
+
+	go func() {
+		start := tr.Start.AddDate(0, 0, -1)
+		end := tr.End
+		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
+			if !t.After(end) {
+				ch <- t
+			}
+		}
+		close(ch)
+	}()
+
+	return ch
+}
+
+func (self Day) NextAfter(t time.Time) (time.Time, error) {
+	desiredDay := int(self)
+
+	if desiredDay == Last {
+		if isLastDayInMonth(t) {
+			return t.AddDate(0, 0, 1).AddDate(0, 1, -1), nil
+		}
+
+		return firstDayOfMonth(t).AddDate(0, 2, -1), nil
+	}
+
+	if t.Day() > desiredDay {
+		if isLastDayInMonth(t) && desiredDay == First {
+			return t.AddDate(0, 0, 1), nil
+		}
+
+		return self.NextAfter(t.AddDate(0, 0, 1))
+	}
+
+	if t.Day() < desiredDay {
+		totalDays := lastDayOfMonth(t).Day()
+		if totalDays < desiredDay {
+			return self.NextAfter(t.AddDate(0, 1, 0))
+		}
+
+		return time.Date(t.Year(), t.Month(), desiredDay, 0, 0, 0, 0, time.UTC), nil
+	}
+
+	totalDaysNextMonth := lastDayOfMonth(lastDayOfMonth(t).AddDate(0, 0, 1)).Day()
+	if totalDaysNextMonth < desiredDay {
+		return self.NextAfter(t.AddDate(0, 2, -1))
+	}
+
+	return t.AddDate(0, 1, 0), nil
 }
 
 func isLastDayInMonth(t time.Time) bool {
