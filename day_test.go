@@ -3,6 +3,7 @@ package recurrence
 import (
 	"encoding/json"
 	"testing"
+	"time"
 )
 
 func TestDayIncludes(t *testing.T) {
@@ -83,6 +84,21 @@ func TestDayUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if output != expected || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkDayOccurrences(b *testing.B) {
+	d := Day(1)
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }

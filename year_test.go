@@ -3,8 +3,10 @@ package recurrence
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestYear(t *testing.T) {
@@ -19,6 +21,21 @@ func TestYear(t *testing.T) {
 	refuteAllOccurring(t, YearRange(2005), y)
 	refuteAllOccurring(t, YearRange(2006), y)
 	assertAllOccurring(t, YearRange(2007), y)
+}
+
+func TestYearOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2000-01-01")), time.Time(NewDate("3000-01-01"))}
+	y := Year(2525)
+
+	var dates []time.Time
+	for d := range y.Occurrences(tr) {
+		dates = append(dates, d)
+	}
+
+	log.Println(dates)
+	if l := len(dates); l != 365 {
+		t.Errorf("You're doing it wrong. Expected 365. Got %d", l)
+	}
 }
 
 func TestYearMarshalJSON(t *testing.T) {
@@ -56,6 +73,21 @@ func TestYearUnmarshalJSON(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &output)
 		if output != expected || err != nil {
 			t.Errorf("\nInput: %v\nExpected: %v\nActual: %v\nError: %v", input, expected, output, err)
+		}
+	}
+}
+
+func BenchmarkYearOccurrences(b *testing.B) {
+	d := Year(2525)
+	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
+	for n := 0; n < b.N; n++ {
+		ch := d.Occurrences(tr)
+		for {
+			_, ok := <-ch
+
+			if !ok {
+				break
+			}
 		}
 	}
 }
