@@ -9,6 +9,10 @@ import (
 // Represents a year.
 type Year int
 
+func (self Year) String() string {
+	return string(int(self))
+}
+
 func (self Year) IsOccurring(t time.Time) bool {
 	return t.Year() == int(self)
 }
@@ -19,8 +23,10 @@ func (self Year) Occurrences(tr TimeRange) chan time.Time {
 	go func() {
 		start := tr.Start.AddDate(0, 0, -1)
 		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && t.Before(end); t, err = self.NextAfter(t) {
-			ch <- t
+		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
+			if !t.After(end) {
+				ch <- t
+			}
 		}
 		close(ch)
 	}()

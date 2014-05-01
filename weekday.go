@@ -23,8 +23,31 @@ func (self Weekday) IsOccurring(t time.Time) bool {
 	return t.Weekday() == time.Weekday(self)
 }
 
-func (self Weekday) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(self)
+func (self Weekday) Occurrences(tr TimeRange) chan time.Time {
+	ch := make(chan time.Time)
+
+	go func() {
+		start := tr.Start.AddDate(0, 0, -1)
+		end := tr.End
+		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
+			ch <- t
+		}
+		close(ch)
+	}()
+
+	return ch
+}
+
+func (self Weekday) String() string {
+	return time.Weekday(self).String()
+}
+
+func (self Weekday) NextAfter(t time.Time) (time.Time, error) {
+	diff := int(self) - int(t.Weekday())
+	if diff <= 0 {
+		diff += 7
+	}
+	return t.AddDate(0, 0, diff), nil
 }
 
 func (self *Weekday) UnmarshalJSON(b []byte) error {

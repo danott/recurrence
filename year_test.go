@@ -24,27 +24,16 @@ func TestYear(t *testing.T) {
 
 func TestYearOccurrences(t *testing.T) {
 	tr := TimeRange{time.Time(NewDate("2000-01-01")), time.Time(NewDate("3000-01-01"))}
-	y := Year(2525)
-
-	var dates []time.Time
-	for d := range y.Occurrences(tr) {
-		dates = append(dates, d)
+	expectations := map[Schedule]int{
+		Year(2525): 365,
 	}
-
-	if l := len(dates); l != 365 {
-		t.Errorf("You're doing it wrong. Expected 365. Got %d", l)
-	}
+	assertOccurrenceGeneration(t, tr, expectations)
 
 	tr = TimeRange{time.Time(NewDate("2525-12-31")), time.Time(NewDate("3000-01-01"))}
-	dates = make([]time.Time, 0)
-
-	for d := range y.Occurrences(tr) {
-		dates = append(dates, d)
+	expectations = map[Schedule]int{
+		Year(2525): 1,
 	}
-
-	if l := len(dates); l != 1 {
-		t.Errorf("You're doing it wrong. Expected 1. Got %d", l)
-	}
+	assertOccurrenceGeneration(t, tr, expectations)
 }
 
 func TestYearMarshalJSON(t *testing.T) {

@@ -31,6 +31,22 @@ func TestWeekday(t *testing.T) {
 		"2006-01-07", "2006-01-14", "2006-01-21", "2006-01-28")
 }
 
+func TestWeekdayOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2006-12-31"))}
+
+	expectations := map[Schedule]int{
+		Sunday:    53,
+		Monday:    52,
+		Tuesday:   52,
+		Wednesday: 52,
+		Thursday:  52,
+		Friday:    52,
+		Saturday:  52,
+	}
+
+	assertOccurrenceGeneration(t, tr, expectations)
+}
+
 func TestWeekdayMarshalJSON(t *testing.T) {
 	tests := map[string]Weekday{
 		`{"weekday":"Sunday"}`:    Sunday,

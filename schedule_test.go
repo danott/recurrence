@@ -50,3 +50,21 @@ func refuteAllOccurring(t *testing.T, r TimeRange, s Schedule) {
 		refuteIsOccurring(t, s, r.Format(f))
 	}
 }
+
+func assertOccurrenceGeneration(t *testing.T, tr TimeRange, expectations map[Schedule]int) {
+	for schedule, expected := range expectations {
+		schedule := schedule.(Schedule)
+		var dates []time.Time
+
+		for d := range schedule.Occurrences(tr) {
+			dates = append(dates, d)
+			if !schedule.IsOccurring(d) {
+				t.Errorf("%s.Occurrences included a wrong date, %s", schedule, d)
+			}
+		}
+
+		if actual := len(dates); actual != expected {
+			t.Errorf("%s.Occurrences should have generated %d. Got %d", schedule, expected, actual)
+		}
+	}
+}
