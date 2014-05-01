@@ -2,6 +2,7 @@ package recurrence
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -10,12 +11,34 @@ type Date time.Time
 
 // Implement Schedule interface.
 func (self Date) IsOccurring(t time.Time) bool {
-	return self.asIntersection().IsOccurring(t)
+	return beginningOfDay(time.Time(self)).Equal(beginningOfDay(t))
 }
 
 // Implement Schedule interface.
-func (self Date) Occurrences(t TimeRange) chan time.Time {
-	return self.asIntersection().Occurrences(t)
+func (self Date) Occurrences(tr TimeRange) chan time.Time {
+	ch := make(chan time.Time)
+
+	go func() {
+		start := tr.Start.AddDate(0, 0, -1)
+		end := tr.End
+		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
+			if !t.After(end) {
+				ch <- t
+			}
+		}
+		close(ch)
+	}()
+
+	return ch
+}
+
+func (self Date) NextAfter(t time.Time) (time.Time, error) {
+	if t.Before(time.Time(self)) {
+		return time.Time(self), nil
+	}
+
+	var zeroDate time.Time
+	return zeroDate, fmt.Errorf("No more occurrences")
 }
 
 func (self Date) asIntersection() Intersection {
