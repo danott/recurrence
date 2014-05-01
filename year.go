@@ -15,12 +15,16 @@ func (self Year) IsOccurring(t time.Time) bool {
 
 func (self Year) Occurrences(tr TimeRange) chan time.Time {
 	ch := make(chan time.Time)
+
 	go func() {
-		for na, ok := self.NextAfter(tr.Start.AddDate(0, 0, -1)); ok == nil && !na.After(tr.End); na, ok = self.NextAfter(na) {
-			ch <- na
+		start := tr.Start.AddDate(0, 0, -1)
+		end := tr.End
+		for t, err := self.NextAfter(start); err == nil && t.Before(end); t, err = self.NextAfter(t) {
+			ch <- t
 		}
 		close(ch)
 	}()
+
 	return ch
 }
 
