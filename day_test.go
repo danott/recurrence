@@ -25,6 +25,25 @@ func TestDayIncludes(t *testing.T) {
 		"2006-09-30", "2006-10-31", "2006-11-30", "2006-12-31")
 }
 
+func TestDayOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[Schedule]int{
+		Day(1):    48,
+		Day(2):    48,
+		Day(3):    48,
+		Day(4):    48,
+		Day(5):    48,
+		Day(27):   48,
+		Day(28):   48,
+		Day(29):   45,
+		Day(30):   44,
+		Day(31):   28,
+		Day(Last): 48,
+	}
+
+	assertOccurrenceGeneration(t, tr, expectations)
+}
 func TestDayMarshalJSON(t *testing.T) {
 	tests := map[string]Day{
 		`{"day":1}`:      Day(1),
