@@ -35,14 +35,16 @@ func (self Year) Occurrences(tr TimeRange) chan time.Time {
 }
 
 func (self Year) NextAfter(t time.Time) (time.Time, error) {
+	if t.Year() < int(self) {
+		return time.Date(int(self), time.January, 1, 0, 0, 0, 0, time.UTC), nil
+	}
+
 	if t.Year() > int(self) || (t.Year() == int(self) && t.Month() == time.December && t.Day() == 31) {
 		var zeroTime time.Time
 		return zeroTime, fmt.Errorf("never happens again")
-	} else if t.Year() < int(self) {
-		return time.Date(int(self), time.January, 1, 0, 0, 0, 0, time.UTC), nil
-	} else {
-		return t.AddDate(0, 0, 1), nil
 	}
+
+	return t.AddDate(0, 0, 1), nil
 }
 
 func (self Year) MarshalJSON() ([]byte, error) {
