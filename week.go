@@ -25,8 +25,8 @@ func (self Week) Occurrences(tr TimeRange) chan time.Time {
 	go func() {
 		start := tr.Start.AddDate(0, 0, -1)
 		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
-			ch <- t
+		for t, err := self.nextAfter(start); err == nil && !t.After(end); t, err = self.nextAfter(t) {
+			ch <- beginningOfDay(t)
 		}
 		close(ch)
 	}()
@@ -53,7 +53,7 @@ func (self Week) String() string {
 	}
 }
 
-func (self Week) NextAfter(t time.Time) (time.Time, error) {
+func (self Week) nextAfter(t time.Time) (time.Time, error) {
 	desiredWeek := int(self)
 
 	if desiredWeek == 1 {
@@ -104,11 +104,11 @@ func (self Week) NextAfter(t time.Time) (time.Time, error) {
 		totalDaysInMonth := lastDayOfMonth(t).Day()
 
 		if totalDaysInMonth < 29 {
-			return self.NextAfter(t.AddDate(0, 1, 0))
+			return self.nextAfter(t.AddDate(0, 1, 0))
 		}
 
 		if isLastDayInMonth(t) {
-			return self.NextAfter(t.AddDate(0, 0, 1))
+			return self.nextAfter(t.AddDate(0, 0, 1))
 		}
 
 		if t.Day() < 27 {
@@ -122,7 +122,7 @@ func (self Week) NextAfter(t time.Time) (time.Time, error) {
 		totalDaysInMonth := lastDayOfMonth(t).Day()
 
 		if isLastDayInMonth(t) {
-			return self.NextAfter(t.AddDate(0, 0, 1))
+			return self.nextAfter(t.AddDate(0, 0, 1))
 		}
 
 		if t.Day() < totalDaysInMonth-7 {

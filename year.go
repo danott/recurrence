@@ -18,23 +18,10 @@ func (self Year) IsOccurring(t time.Time) bool {
 }
 
 func (self Year) Occurrences(tr TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		start := tr.Start.AddDate(0, 0, -1)
-		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
-			if !t.After(end) {
-				ch <- t
-			}
-		}
-		close(ch)
-	}()
-
-	return ch
+	return occurrencesFor(self, tr)
 }
 
-func (self Year) NextAfter(t time.Time) (time.Time, error) {
+func (self Year) nextAfter(t time.Time) (time.Time, error) {
 	if t.Year() < int(self) {
 		return time.Date(int(self), time.January, 1, 0, 0, 0, 0, time.UTC), nil
 	}

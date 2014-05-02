@@ -17,22 +17,18 @@ func (self TimeRange) IsOccurring(t time.Time) bool {
 }
 
 func (self TimeRange) Occurrences(other TimeRange) chan time.Time {
-	return self.occurrencesOfSchedule(other)
-}
-
-func (self TimeRange) occurrencesOfSchedule(s Schedule) chan time.Time {
-	c := make(chan time.Time)
+	ch := make(chan time.Time)
 
 	go func() {
 		for t := range self.eachDate() {
-			if s.IsOccurring(t) {
-				c <- t
+			if other.IsOccurring(t) {
+				ch <- beginningOfDay(t)
 			}
 		}
-		close(c)
+		close(ch)
 	}()
 
-	return c
+	return ch
 }
 
 func (self TimeRange) eachDate() chan time.Time {

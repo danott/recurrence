@@ -19,23 +19,10 @@ func (self Day) IsOccurring(t time.Time) bool {
 }
 
 func (self Day) Occurrences(tr TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		start := tr.Start.AddDate(0, 0, -1)
-		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
-			if !t.After(end) {
-				ch <- t
-			}
-		}
-		close(ch)
-	}()
-
-	return ch
+	return occurrencesFor(self, tr)
 }
 
-func (self Day) NextAfter(t time.Time) (time.Time, error) {
+func (self Day) nextAfter(t time.Time) (time.Time, error) {
 	desiredDay := int(self)
 
 	if desiredDay == Last {
@@ -51,13 +38,13 @@ func (self Day) NextAfter(t time.Time) (time.Time, error) {
 			return t.AddDate(0, 0, 1), nil
 		}
 
-		return self.NextAfter(t.AddDate(0, 0, 1))
+		return self.nextAfter(t.AddDate(0, 0, 1))
 	}
 
 	if t.Day() < desiredDay {
 		totalDays := lastDayOfMonth(t).Day()
 		if totalDays < desiredDay {
-			return self.NextAfter(t.AddDate(0, 1, 0))
+			return self.nextAfter(t.AddDate(0, 1, 0))
 		}
 
 		return time.Date(t.Year(), t.Month(), desiredDay, 0, 0, 0, 0, time.UTC), nil
@@ -65,7 +52,7 @@ func (self Day) NextAfter(t time.Time) (time.Time, error) {
 
 	totalDaysNextMonth := lastDayOfMonth(lastDayOfMonth(t).AddDate(0, 0, 1)).Day()
 	if totalDaysNextMonth < desiredDay {
-		return self.NextAfter(t.AddDate(0, 2, -1))
+		return self.nextAfter(t.AddDate(0, 2, -1))
 	}
 
 	return t.AddDate(0, 1, 0), nil

@@ -19,30 +19,17 @@ const (
 	Saturday
 )
 
+// Implement Schedule interface.
 func (self Weekday) IsOccurring(t time.Time) bool {
 	return t.Weekday() == time.Weekday(self)
 }
 
+// Implement Schedule interface.
 func (self Weekday) Occurrences(tr TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		start := tr.Start.AddDate(0, 0, -1)
-		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
-			ch <- t
-		}
-		close(ch)
-	}()
-
-	return ch
+	return occurrencesFor(self, tr)
 }
 
-func (self Weekday) String() string {
-	return time.Weekday(self).String()
-}
-
-func (self Weekday) NextAfter(t time.Time) (time.Time, error) {
+func (self Weekday) nextAfter(t time.Time) (time.Time, error) {
 	diff := int(self) - int(t.Weekday())
 	if diff <= 0 {
 		diff += 7
@@ -75,4 +62,8 @@ func (self *Weekday) UnmarshalJSON(b []byte) error {
 
 func (self Weekday) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"weekday": time.Weekday(self).String()})
+}
+
+func (self Weekday) String() string {
+	return time.Weekday(self).String()
 }

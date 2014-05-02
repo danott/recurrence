@@ -29,23 +29,10 @@ func (self Month) IsOccurring(t time.Time) bool {
 }
 
 func (self Month) Occurrences(tr TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		start := tr.Start.AddDate(0, 0, -1)
-		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
-			if !t.After(end) {
-				ch <- t
-			}
-		}
-		close(ch)
-	}()
-
-	return ch
+	return occurrencesFor(self, tr)
 }
 
-func (self Month) NextAfter(t time.Time) (time.Time, error) {
+func (self Month) nextAfter(t time.Time) (time.Time, error) {
 	desiredMonth := int(self)
 	tMonth := int(t.Month())
 

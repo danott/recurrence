@@ -16,23 +16,10 @@ func (self Date) IsOccurring(t time.Time) bool {
 
 // Implement Schedule interface.
 func (self Date) Occurrences(tr TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		start := tr.Start.AddDate(0, 0, -1)
-		end := tr.End
-		for t, err := self.NextAfter(start); err == nil && !t.After(end); t, err = self.NextAfter(t) {
-			if !t.After(end) {
-				ch <- t
-			}
-		}
-		close(ch)
-	}()
-
-	return ch
+	return occurrencesFor(self, tr)
 }
 
-func (self Date) NextAfter(t time.Time) (time.Time, error) {
+func (self Date) nextAfter(t time.Time) (time.Time, error) {
 	if t.Before(time.Time(self)) {
 		return time.Time(self), nil
 	}
