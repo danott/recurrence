@@ -20,7 +20,42 @@ func (self Intersection) IsOccurring(t time.Time) bool {
 }
 
 func (self Intersection) Occurrences(t TimeRange) chan time.Time {
-	return t.occurrencesOfSchedule(self)
+	ch := make(chan time.Time)
+	done := make(chan bool, len(self))
+	candidates := make(chan time.Time)
+
+	for _, schedule := range self {
+		go func(schedule Schedule) {
+			for t := range schedule.Occurrences(t) {
+				candidates <- t
+			}
+			done <- true
+		}(schedule)
+	}
+
+	go func() {
+		candidatesMap := make(map[string]int)
+		for candidate := range candidates {
+			key := candidate.Format("20060102")
+			foundCount, _ := candidatesMap[key]
+			newFoundCount := foundCount + 1
+			candidatesMap[key] = newFoundCount
+			if newFoundCount == len(self) {
+				ch <- candidate
+			}
+		}
+	}()
+
+	go func() {
+		for i := 0; i < len(self); i++ {
+			<-done
+		}
+		close(ch)
+		close(done)
+		close(candidates)
+	}()
+
+	return ch
 }
 
 func (self Intersection) MarshalJSON() ([]byte, error) {
