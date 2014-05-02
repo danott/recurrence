@@ -18,6 +18,18 @@ func TestIntersection(t *testing.T) {
 		"2006-01-22", "2006-01-29")
 }
 
+func TestIntersectionOccurrences(t *testing.T) {
+	tr := TimeRange{time.Time(NewDate("2006-01-01")), time.Time(NewDate("2009-12-31"))}
+
+	expectations := map[int]Schedule{
+		8: Intersection{Friday, Day(13)},
+		4: Intersection{November, Thursday, Week(4)},
+		3: Intersection{Day(Last), Day(28)},
+	}
+
+	assertOccurrenceGeneration2(t, tr, expectations)
+}
+
 func TestIntersectionMarshalJSON(t *testing.T) {
 	tests := map[string]Intersection{
 		`{"intersection":[{"day":1},{"day":"Last"},{"month":"January"}]}`:         Intersection{Day(First), Day(Last), January},
@@ -48,7 +60,7 @@ func TestIntersectionUnmarshalJSON(t *testing.T) {
 }
 
 func BenchmarkIntersectionOccurrences(b *testing.B) {
-	d := Intersection{Friday, Day(13)}
+	d := Intersection{November, Thursday, Week(4)}
 	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
 	for n := 0; n < b.N; n++ {
 		ch := d.Occurrences(tr)
