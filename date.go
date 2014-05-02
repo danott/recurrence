@@ -41,14 +41,6 @@ func (self Date) NextAfter(t time.Time) (time.Time, error) {
 	return zeroDate, fmt.Errorf("No more occurrences")
 }
 
-func (self Date) asIntersection() Intersection {
-	return Intersection{
-		Year(time.Time(self).Year()),
-		Month(time.Time(self).Month()),
-		Day(time.Time(self).Day()),
-	}
-}
-
 // Implement json.Unmarshaler interface.
 func (self *Date) UnmarshalJSON(b []byte) error {
 	t, err := time.Parse(`"2006-01-02"`, string(b))
