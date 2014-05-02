@@ -28,6 +28,7 @@ func TestUnionOccurrences(t *testing.T) {
 	expectations := map[int]Schedule{
 		368: Union{June, July, August},
 		626: Union{Monday, Wednesday, Friday},
+		209: Union{Monday, Monday}, // Shouldn't duplicate days
 	}
 
 	assertOccurrenceGeneration2(t, tr, expectations)

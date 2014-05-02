@@ -22,15 +22,29 @@ func (self Union) IsOccurring(t time.Time) bool {
 func (self Union) Occurrences(t TimeRange) chan time.Time {
 	ch := make(chan time.Time)
 	done := make(chan bool, len(self))
+	candidates := make(chan time.Time)
 
 	for _, schedule := range self {
 		go func(schedule Schedule) {
 			for t := range schedule.Occurrences(t) {
-				ch <- t
+
+				candidates <- t
 			}
 			done <- true
 		}(schedule)
 	}
+
+	go func() {
+		candidatesMap := make(map[string]bool)
+		for candidate := range candidates {
+			key := candidate.Format("20060102")
+			_, found := candidatesMap[key]
+			if !found {
+				candidatesMap[key] = true
+				ch <- candidate
+			}
+		}
+	}()
 
 	go func() {
 		for i := 0; i < len(self); i++ {
