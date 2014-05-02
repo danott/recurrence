@@ -62,7 +62,7 @@ func (self *TimeRange) UnmarshalJSON(b []byte) error {
 }
 
 func beginningOfDay(t time.Time) time.Time {
-	return t.Add(time.Hour * -12).Round(time.Hour * 24)
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
 
 // Generate a TimeRange representing the entire year.
