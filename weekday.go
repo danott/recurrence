@@ -19,6 +19,11 @@ const (
 	Saturday
 )
 
+// Implement Stringer interface.
+func (self Weekday) String() string {
+	return time.Weekday(self).String()
+}
+
 // Implement Schedule interface.
 func (self Weekday) IsOccurring(t time.Time) bool {
 	return t.Weekday() == time.Weekday(self)
@@ -37,6 +42,12 @@ func (self Weekday) nextAfter(t time.Time) (time.Time, error) {
 	return t.AddDate(0, 0, diff), nil
 }
 
+// Implement json.Marshaler interface.
+func (self Weekday) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"weekday": time.Weekday(self).String()})
+}
+
+// Implement json.Unmarshaler interface.
 func (self *Weekday) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `0`, `"Sunday"`:
@@ -58,12 +69,4 @@ func (self *Weekday) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
-}
-
-func (self Weekday) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"weekday": time.Weekday(self).String()})
-}
-
-func (self Weekday) String() string {
-	return time.Weekday(self).String()
 }

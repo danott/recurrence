@@ -24,8 +24,8 @@ func (self Date) nextAfter(t time.Time) (time.Time, error) {
 		return time.Time(self), nil
 	}
 
-	var zeroDate time.Time
-	return zeroDate, fmt.Errorf("No more occurrences")
+	var zeroTime time.Time
+	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
 // Implement json.Unmarshaler interface.
@@ -52,7 +52,7 @@ func NewDate(s string) Date {
 	t, err := time.Parse("2006-01-02", s)
 
 	if err != nil {
-		panic("NewDate requires format '2006-01-02'")
+		panic(`NewDate(string) requires format "2006-01-02"`)
 	}
 
 	return Date(t)

@@ -11,29 +11,7 @@ import (
 // with other entities satisfying the Schedule interface.
 type Week int
 
-func (self Week) IsOccurring(t time.Time) bool {
-	if weekInt := int(self); weekInt == Last {
-		return isLastWeekInMonth(t)
-	} else {
-		return weekInMonth(t) == weekInt
-	}
-}
-
-func (self Week) Occurrences(tr TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		start := tr.Start.AddDate(0, 0, -1)
-		end := tr.End
-		for t, err := self.nextAfter(start); err == nil && !t.After(end); t, err = self.nextAfter(t) {
-			ch <- beginningOfDay(t)
-		}
-		close(ch)
-	}()
-
-	return ch
-}
-
+// Implement Stringer interface.
 func (self Week) String() string {
 	switch int(self) {
 	case 1:
@@ -51,6 +29,20 @@ func (self Week) String() string {
 	default:
 		return "(Never Week)"
 	}
+}
+
+// Implement Schedule interface.
+func (self Week) IsOccurring(t time.Time) bool {
+	if weekInt := int(self); weekInt == Last {
+		return isLastWeekInMonth(t)
+	} else {
+		return weekInMonth(t) == weekInt
+	}
+}
+
+// Implement Schedule interface.
+func (self Week) Occurrences(tr TimeRange) chan time.Time {
+	return occurrencesFor(self, tr)
 }
 
 func (self Week) nextAfter(t time.Time) (time.Time, error) {
@@ -135,14 +127,7 @@ func (self Week) nextAfter(t time.Time) (time.Time, error) {
 	return t, fmt.Errorf("You should never get here.")
 }
 
-func weekInMonth(t time.Time) int {
-	return ((t.Day() - 1) / 7) + 1
-}
-
-func isLastWeekInMonth(t time.Time) bool {
-	return t.Month() != t.AddDate(0, 0, 7).Month()
-}
-
+// Implement json.Marshaler interface.
 func (self Week) MarshalJSON() ([]byte, error) {
 	if int(self) == Last {
 		return json.Marshal(map[string]interface{}{"week": "Last"})
@@ -151,6 +136,7 @@ func (self Week) MarshalJSON() ([]byte, error) {
 	}
 }
 
+// Implement json.Unmarshaler interface.
 func (self *Week) UnmarshalJSON(b []byte) error {
 	switch s := string(b); s {
 	case `1`, `2`, `3`, `4`, `5`:
@@ -166,4 +152,12 @@ func (self *Week) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
+}
+
+func isLastWeekInMonth(t time.Time) bool {
+	return t.Month() != t.AddDate(0, 0, 7).Month()
+}
+
+func weekInMonth(t time.Time) int {
+	return ((t.Day() - 1) / 7) + 1
 }

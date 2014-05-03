@@ -24,10 +24,17 @@ const (
 	December
 )
 
+// Implement Stringer interface.
+func (self Month) String() string {
+	return time.Month(self).String()
+}
+
+// Implement Schedule interface.
 func (self Month) IsOccurring(t time.Time) bool {
 	return t.Month() == time.Month(self)
 }
 
+// Implement Schedule interface.
 func (self Month) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(self, tr)
 }
@@ -47,10 +54,12 @@ func (self Month) nextAfter(t time.Time) (time.Time, error) {
 	return t.AddDate(0, 0, 1), nil
 }
 
+// Implement json.Marshaler interface.
 func (self Month) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"month": time.Month(self).String()})
 }
 
+// Implement json.Unmarshaler interface.
 func (self *Month) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `1`, `"January"`:
@@ -82,8 +91,4 @@ func (self *Month) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
-}
-
-func (self Month) String() string {
-	return time.Month(self).String()
 }

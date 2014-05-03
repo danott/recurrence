@@ -12,38 +12,30 @@ type TimeRange struct {
 	End   time.Time
 }
 
+// Implement Schedule interface.
 func (self TimeRange) IsOccurring(t time.Time) bool {
 	return !(t.Before(self.Start) || t.After(self.End))
 }
 
+// Implement Schedule interface.
 func (self TimeRange) Occurrences(other TimeRange) chan time.Time {
-	ch := make(chan time.Time)
-
-	go func() {
-		for t := range self.eachDate() {
-			if other.IsOccurring(t) {
-				ch <- beginningOfDay(t)
-			}
-		}
-		close(ch)
-	}()
-
-	return ch
+	return occurrencesFor(self, other)
 }
 
-func (self TimeRange) eachDate() chan time.Time {
-	c := make(chan time.Time)
+func (self TimeRange) nextAfter(t time.Time) (time.Time, error) {
+	if t.Before(self.Start) {
+		return self.Start, nil
+	}
 
-	go func() {
-		for t := beginningOfDay(self.Start); !t.After(self.End); t = t.AddDate(0, 0, 1) {
-			c <- t
-		}
-		close(c)
-	}()
+	if t.Before(self.End) {
+		return t.AddDate(0, 0, 1), nil
+	}
 
-	return c
+	var zeroTime time.Time
+	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
+// Implement json.Unmarshaler interface.
 func (self *TimeRange) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 	var err error
@@ -61,8 +53,19 @@ func (self *TimeRange) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-func beginningOfDay(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+// NewTimeRange let's you create a new TimeRange from the time format "2006-01-02"
+func NewTimeRange(start, end string) TimeRange {
+	tStart, err := time.Parse("2006-01-02", start)
+	if err != nil {
+		panic(`NewDate(string) requires format "2006-01-02"`)
+	}
+
+	tEnd, err := time.Parse("2006-01-02", end)
+	if err != nil {
+		panic(`NewDate(string) requires format "2006-01-02"`)
+	}
+
+	return TimeRange{tStart, tEnd}
 }
 
 // Generate a TimeRange representing the entire year.
@@ -92,4 +95,21 @@ func MonthRange(month interface{}, year int) TimeRange {
 		time.Date(year, m, 1, 0, 0, 0, 0, time.UTC),
 		time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC),
 	}
+}
+
+func beginningOfDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+func (self TimeRange) eachDate() chan time.Time {
+	c := make(chan time.Time)
+
+	go func() {
+		for t := beginningOfDay(self.Start); !t.After(self.End); t = t.AddDate(0, 0, 1) {
+			c <- t
+		}
+		close(c)
+	}()
+
+	return c
 }

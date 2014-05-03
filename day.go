@@ -10,6 +10,7 @@ import (
 // A Day specifies a day of the month. (1, 2, 3, ...31)
 type Day int
 
+// Implement Schedule interface.
 func (self Day) IsOccurring(t time.Time) bool {
 	if self := int(self); self == Last {
 		return isLastDayInMonth(t)
@@ -18,6 +19,7 @@ func (self Day) IsOccurring(t time.Time) bool {
 	}
 }
 
+// Implement Schedule interface.
 func (self Day) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(self, tr)
 }
@@ -58,18 +60,7 @@ func (self Day) nextAfter(t time.Time) (time.Time, error) {
 	return t.AddDate(0, 1, 0), nil
 }
 
-func isLastDayInMonth(t time.Time) bool {
-	return t.Month() != t.AddDate(0, 0, 1).Month()
-}
-
-func lastDayOfMonth(t time.Time) time.Time {
-	return firstDayOfMonth(t).AddDate(0, 1, -1)
-}
-
-func firstDayOfMonth(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
-}
-
+// Implement json.Marshaler interface.
 func (self Day) MarshalJSON() ([]byte, error) {
 	if int(self) == Last {
 		return json.Marshal(map[string]interface{}{"day": "Last"})
@@ -78,6 +69,7 @@ func (self Day) MarshalJSON() ([]byte, error) {
 	}
 }
 
+// Implement json.Unmarshaler interface.
 func (self *Day) UnmarshalJSON(b []byte) error {
 	s := string(b)
 
@@ -98,4 +90,16 @@ func (self *Day) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
+}
+
+func isLastDayInMonth(t time.Time) bool {
+	return t.Month() != t.AddDate(0, 0, 1).Month()
+}
+
+func lastDayOfMonth(t time.Time) time.Time {
+	return firstDayOfMonth(t).AddDate(0, 1, -1)
+}
+
+func firstDayOfMonth(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
 }

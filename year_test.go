@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func TestYear(t *testing.T) {
+func TestYearIsOccurring(t *testing.T) {
 	y := Year(2006)
 
 	refuteAllOccurring(t, YearRange(2005), y)
@@ -23,7 +23,7 @@ func TestYear(t *testing.T) {
 }
 
 func TestYearOccurrences(t *testing.T) {
-	tr := TimeRange{time.Time(NewDate("2000-01-01")), time.Time(NewDate("3000-01-01"))}
+	tr := NewTimeRange("2000-01-01", "3000-01-01")
 	expectations := map[Schedule]int{
 		Year(2525): 365,
 	}
