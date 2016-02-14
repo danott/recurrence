@@ -93,3 +93,40 @@ func TestNextHourMinuteSecondOccurences(t *testing.T) {
 		t.Errorf("Was expecting %d days but instead got %d instead", expectedDays, len(nextDates))
 	}
 }
+
+func TestMarshalHourMinuteSecondJSON(t *testing.T) {
+	hms := NewHourMinuteSeconds(14, 30, 0)
+	js, err := hms.MarshalJSON()
+	if err != nil {
+		t.Errorf("Unable to marshal Minute Hour Second: %v", err)
+	}
+
+	expected := `{"hour":14,"minute":30,"second":0}`
+
+	if string(js) != expected {
+		t.Errorf("Expected and actual marshaled strings differ [expected=%s, actual=%s]", expected, string(js))
+	}
+}
+
+func TestUnmarshalHourMinuteSecondJSON(t *testing.T) {
+	js := `{"hour":14,"minute":30,"second":0}`
+	hms := new(HourMinuteSecond)
+
+	err := hms.UnmarshalJSON([]byte(js))
+	if err != nil {
+		t.Errorf("Unable to unmarshal: %v", err)
+	}
+
+	if hms.hour != 14 {
+		t.Errorf("Hours differ: [expected=%d, actual=%d]", 14, hms.hour)
+	}
+
+	if hms.minute != 30 {
+		t.Errorf("Minutes differ: [expected=%d, actual=%d]", 30, hms.minute)
+	}
+
+	if hms.second != 0 {
+		t.Errorf("Seconds differ: [expected=%d, actual=%d]", 14, hms.second)
+	}
+
+}
