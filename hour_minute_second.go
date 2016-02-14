@@ -25,7 +25,7 @@ func (hms HourMinuteSecond) IsOccurring(t time.Time) bool {
 		int(hms.second) == t.Second()
 }
 
-func (hms HourMinuteSecond) Occurrences(tr TimeRange) chan time.Time {
+func (hms HourMinuteSecond) Occurrences(tr TimeRange) []time.Time {
 	return occurrencesFor(hms, tr)
 }
 
@@ -58,8 +58,6 @@ func (hms *HourMinuteSecond) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &m); err != nil {
 		return err
 	}
-
-	fmt.Printf("********** %v\n", m)
 
 	hourI, ok := m["hour"]
 	if !ok {

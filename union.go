@@ -21,42 +21,59 @@ func (self Union) IsOccurring(t time.Time) bool {
 }
 
 // Implement Schedule interface.
-func (self Union) Occurrences(t TimeRange) chan time.Time {
-	ch := make(chan time.Time)
+func (self Union) Occurrences(t TimeRange) []time.Time {
 	done := make(chan bool, len(self))
-	candidates := make(chan time.Time)
+	candidates := make(chan time.Time, 100)
+	ts := make([]time.Time, 0)
 
 	for _, schedule := range self {
 		go func(schedule Schedule) {
-			for t := range schedule.Occurrences(t) {
-
-				candidates <- t
+			for _, oc := range schedule.Occurrences(t) {
+				candidates <- oc
 			}
 			done <- true
 		}(schedule)
 	}
 
-	go func() {
-		candidatesMap := make(map[string]bool)
-		for candidate := range candidates {
-			key := candidate.Format("20060102")
+	candidatesMap := make(map[string]bool)
+	parallelDone := 0
+	for parallelDone < len(self) {
+		select {
+		case selected := <-candidates:
+			key := selected.Format("20060102")
 			_, found := candidatesMap[key]
 			if !found {
 				candidatesMap[key] = true
-				ch <- candidate
+				ts = append(ts, selected)
 			}
+		case <-done:
+			parallelDone++
 		}
-	}()
+	}
 
-	go func() {
-		for i := 0; i < len(self); i++ {
-			<-done
+	// We can safely close the "done" channel
+	close(done)
+
+	// We must make sure we have fully drained the "candidates" channel
+	stillLoop := true
+	for stillLoop {
+		select {
+		case selected := <-candidates:
+			key := selected.Format("20060102")
+			_, found := candidatesMap[key]
+			if !found {
+				candidatesMap[key] = true
+				ts = append(ts, selected)
+			}
+		default:
+			stillLoop = false
 		}
-		close(ch)
-		close(done)
-	}()
+	}
 
-	return ch
+	// We can also safely close the "candidates" channel
+	close(candidates)
+
+	return ts
 }
 
 // Implement json.Marshaler interface.

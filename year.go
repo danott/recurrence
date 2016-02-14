@@ -20,7 +20,7 @@ func (self Year) IsOccurring(t time.Time) bool {
 }
 
 // Implement Schedule interface.
-func (self Year) Occurrences(tr TimeRange) chan time.Time {
+func (self Year) Occurrences(tr TimeRange) []time.Time {
 	return occurrencesFor(self, tr)
 }
 

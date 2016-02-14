@@ -83,13 +83,6 @@ func BenchmarkIntersectionOccurrences(b *testing.B) {
 	d := Intersection{November, Thursday, Week(4)}
 	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
 	for n := 0; n < b.N; n++ {
-		ch := d.Occurrences(tr)
-		for {
-			_, ok := <-ch
-
-			if !ok {
-				break
-			}
-		}
+		d.Occurrences(tr)
 	}
 }

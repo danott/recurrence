@@ -91,13 +91,6 @@ func BenchmarkWeekOccurrences(b *testing.B) {
 			w = Week(run)
 		}
 
-		ch := w.Occurrences(tr)
-		for {
-			_, ok := <-ch
-
-			if !ok {
-				break
-			}
-		}
+		w.Occurrences(tr)
 	}
 }
