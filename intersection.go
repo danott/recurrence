@@ -12,7 +12,7 @@ type Intersection []Schedule
 // Implement Schedule interface.
 func (self Intersection) IsOccurring(t time.Time) bool {
 	for _, r := range self {
-		if r.IsOccurring(t) == false {
+		if !r.IsOccurring(t) {
 			return false
 		}
 	}

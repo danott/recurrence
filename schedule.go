@@ -10,6 +10,7 @@ type Schedule interface {
 	Occurrences(TimeRange) chan time.Time
 }
 
+// @todo why is this not in the schedule interface?
 type nextable interface {
 	nextAfter(time.Time) (time.Time, error)
 }
