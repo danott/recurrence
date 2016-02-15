@@ -21,43 +21,63 @@ func (self Intersection) IsOccurring(t time.Time) bool {
 }
 
 // Implement Schedule interface.
-func (self Intersection) Occurrences(t TimeRange) chan time.Time {
-	ch := make(chan time.Time)
+func (self Intersection) Occurrences(t TimeRange) []time.Time {
 	done := make(chan bool, len(self))
-	candidates := make(chan time.Time)
+	candidates := make(chan time.Time, 100)
+	ts := make([]time.Time, 0)
 
 	for _, schedule := range self {
 		go func(schedule Schedule) {
-			for t := range schedule.Occurrences(t) {
-				candidates <- t
+			for _, oc := range schedule.Occurrences(t) {
+				candidates <- oc
 			}
 			done <- true
 		}(schedule)
 	}
 
-	go func() {
-		candidatesMap := make(map[string]int)
-		for candidate := range candidates {
-			key := candidate.Format("20060102")
+	candidatesMap := make(map[string]int)
+	parallelDone := 0
+	for parallelDone < len(self) {
+		select {
+		case selected := <-candidates:
+			key := selected.Format("20060102")
 			foundCount, _ := candidatesMap[key]
 			newFoundCount := foundCount + 1
 			candidatesMap[key] = newFoundCount
 			if newFoundCount == len(self) {
-				ch <- candidate
+				ts = append(ts, selected)
 			}
+		case <-done:
+			parallelDone++
 		}
-	}()
+	}
 
-	go func() {
-		for i := 0; i < len(self); i++ {
-			<-done
+	// We can safely close channel done now
+	close(done)
+
+	// What if we somehow have some residual data in candidates channel?
+	stillLopp := true
+	for stillLopp {
+		select {
+		case selected := <-candidates:
+			key := selected.Format("20060102")
+			foundCount, _ := candidatesMap[key]
+			newFoundCount := foundCount + 1
+			candidatesMap[key] = newFoundCount
+			if newFoundCount == len(self) {
+				ts = append(ts, selected)
+			}
+			// This means there are no more elements left in our channel
+		default:
+			// We definitely don't have anything in this channel
+			stillLopp = false
 		}
-		close(ch)
-		close(done)
-		close(candidates)
-	}()
+	}
 
-	return ch
+	// We can also safely close the candidates channel
+	close(candidates)
+
+	return ts
 }
 
 // Implement json.Marshaler interface.

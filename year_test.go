@@ -79,13 +79,6 @@ func BenchmarkYearOccurrences(b *testing.B) {
 	d := Year(2525)
 	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
 	for n := 0; n < b.N; n++ {
-		ch := d.Occurrences(tr)
-		for {
-			_, ok := <-ch
-
-			if !ok {
-				break
-			}
-		}
+		d.Occurrences(tr)
 	}
 }
