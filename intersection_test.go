@@ -59,17 +59,30 @@ func TestIntersectionUnmarshalJSON(t *testing.T) {
 	}
 }
 
+func TestIntersectionDayAndHourMinuteSecondOccuring(t *testing.T) {
+	dhms := Intersection{Union{Saturday, Sunday}, NewHourMinuteSeconds(14, 30, 0)}
+	// Today is Sunday 14/02/2016
+	today := time.Date(2016, time.February, 14, 14, 30, 0, 0, time.UTC)
+
+	if !dhms.IsOccurring(today) {
+		t.Errorf("Event should be scheduled today: %v", today)
+	}
+
+	nextWeek := today.AddDate(0, 0, 6)
+	if !dhms.IsOccurring(nextWeek) {
+		t.Errorf("Event should be scheduled next Saturday too: %v", nextWeek)
+	}
+
+	nextWeek = nextWeek.AddDate(0, 0, 1)
+	if !dhms.IsOccurring(nextWeek) {
+		t.Errorf("Event should be scheduled next Sunday too: %v", nextWeek)
+	}
+}
+
 func BenchmarkIntersectionOccurrences(b *testing.B) {
 	d := Intersection{November, Thursday, Week(4)}
 	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
 	for n := 0; n < b.N; n++ {
-		ch := d.Occurrences(tr)
-		for {
-			_, ok := <-ch
-
-			if !ok {
-				break
-			}
-		}
+		d.Occurrences(tr)
 	}
 }

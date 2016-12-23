@@ -56,7 +56,7 @@ func assertOccurrenceGeneration(t *testing.T, tr TimeRange, expectations map[Sch
 		schedule := schedule.(Schedule)
 		var dates []time.Time
 
-		for d := range schedule.Occurrences(tr) {
+		for _, d := range schedule.Occurrences(tr) {
 			dates = append(dates, d)
 			if !schedule.IsOccurring(d) || d.Before(tr.Start) || d.After(tr.End) {
 				t.Errorf("%s.Occurrences(%v) included a date it shouldn't have: %s", schedule, tr, d)
@@ -74,7 +74,7 @@ func assertOccurrenceGeneration2(t *testing.T, tr TimeRange, expectations map[in
 		schedule := schedule.(Schedule)
 		var dates []time.Time
 
-		for d := range schedule.Occurrences(tr) {
+		for _, d := range schedule.Occurrences(tr) {
 			dates = append(dates, d)
 			if !schedule.IsOccurring(d) || d.Before(tr.Start) || d.After(tr.End) {
 				t.Errorf("%s.Occurrences(%v) included a date it shouldn't have: %s", schedule, tr, d)

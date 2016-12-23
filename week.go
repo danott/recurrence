@@ -41,7 +41,7 @@ func (self Week) IsOccurring(t time.Time) bool {
 }
 
 // Implement Schedule interface.
-func (self Week) Occurrences(tr TimeRange) chan time.Time {
+func (self Week) Occurrences(tr TimeRange) []time.Time {
 	return occurrencesFor(self, tr)
 }
 

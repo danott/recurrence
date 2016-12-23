@@ -67,13 +67,6 @@ func BenchmarkUnionOccurrences(b *testing.B) {
 	d := Union{January, March, May, Day(1), Day(Last)}
 	tr := TimeRange{time.Now(), time.Now().AddDate(1000, 0, 0)}
 	for n := 0; n < b.N; n++ {
-		ch := d.Occurrences(tr)
-		for {
-			_, ok := <-ch
-
-			if !ok {
-				break
-			}
-		}
+		d.Occurrences(tr)
 	}
 }

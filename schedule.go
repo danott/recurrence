@@ -7,26 +7,24 @@ import "time"
 // occurs in the Schedule, and generate time.Times satisfying the Schedule.
 type Schedule interface {
 	IsOccurring(time.Time) bool
-	Occurrences(TimeRange) chan time.Time
+	Occurrences(TimeRange) []time.Time
 }
 
+// @todo why is this not in the schedule interface?
 type nextable interface {
 	nextAfter(time.Time) (time.Time, error)
 }
 
-func occurrencesFor(schedule nextable, timeRange TimeRange) chan time.Time {
-	ch := make(chan time.Time)
+func occurrencesFor(schedule nextable, timeRange TimeRange) []time.Time {
+	ts := make([]time.Time, 0)
+	start := timeRange.Start.AddDate(0, 0, -1)
+	end := timeRange.End
 
-	go func() {
-		start := timeRange.Start.AddDate(0, 0, -1)
-		end := timeRange.End
-		for t, err := schedule.nextAfter(start); err == nil && !t.After(end); t, err = schedule.nextAfter(t) {
-			if !t.After(end) {
-				ch <- beginningOfDay(t)
-			}
+	for t, err := schedule.nextAfter(start); err == nil && !t.After(end); t, err = schedule.nextAfter(t) {
+		if !t.After(end) {
+			ts = append(ts, beginningOfDay(t))
 		}
-		close(ch)
-	}()
+	}
 
-	return ch
+	return ts
 }
