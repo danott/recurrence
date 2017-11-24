@@ -12,11 +12,13 @@ type Day int
 
 // Implement Schedule interface.
 func (d Day) IsOccurring(t time.Time) bool {
-	if d := int(d); d == Last {
+	dayInt := int(d)
+
+	if dayInt == Last {
 		return isLastDayInMonth(t)
-	} else {
-		return d == t.Day()
 	}
+
+	return dayInt == t.Day()
 }
 
 // Implement Schedule interface.
@@ -64,9 +66,9 @@ func (d Day) nextAfter(t time.Time) (time.Time, error) {
 func (d Day) MarshalJSON() ([]byte, error) {
 	if int(d) == Last {
 		return json.Marshal(map[string]interface{}{"day": "Last"})
-	} else {
-		return json.Marshal(map[string]interface{}{"day": int(d)})
 	}
+
+	return json.Marshal(map[string]interface{}{"day": int(d)})
 }
 
 // Implement json.Unmarshaler interface.
@@ -78,15 +80,15 @@ func (d *Day) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		if s != `"Last"` {
 			return fmt.Errorf("day cannot unmarshal %s", b)
-		} else {
-			*d = Day(Last)
 		}
+
+		*d = Day(Last)
 	} else {
 		if i < 1 || i > 31 {
 			return fmt.Errorf("day must be 1-31. Was %#v", i)
-		} else {
-			*d = Day(i)
 		}
+
+		*d = Day(i)
 	}
 
 	return nil

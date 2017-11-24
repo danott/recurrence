@@ -33,11 +33,13 @@ func (w Week) String() string {
 
 // Implement Schedule interface.
 func (w Week) IsOccurring(t time.Time) bool {
-	if weekInt := int(w); weekInt == Last {
+	weekInt := int(w)
+
+	if weekInt == Last {
 		return isLastWeekInMonth(t)
-	} else {
-		return weekInMonth(t) == weekInt
 	}
+
+	return weekInMonth(t) == weekInt
 }
 
 // Implement Schedule interface.
@@ -131,9 +133,9 @@ func (w Week) nextAfter(t time.Time) (time.Time, error) {
 func (w Week) MarshalJSON() ([]byte, error) {
 	if int(w) == Last {
 		return json.Marshal(map[string]interface{}{"week": "Last"})
-	} else {
-		return json.Marshal(map[string]interface{}{"week": int(w)})
 	}
+
+	return json.Marshal(map[string]interface{}{"week": int(w)})
 }
 
 // Implement json.Unmarshaler interface.
