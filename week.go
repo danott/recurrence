@@ -126,7 +126,7 @@ func (w Week) nextAfter(t time.Time) (time.Time, error) {
 		return t.AddDate(0, 0, 1), nil
 	}
 
-	return t, fmt.Errorf("You should never get here.")
+	return t, fmt.Errorf("You should never get here")
 }
 
 // Implement json.Marshaler interface.
