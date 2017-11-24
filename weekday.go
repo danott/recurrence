@@ -20,22 +20,22 @@ const (
 )
 
 // Implement Stringer interface.
-func (self Weekday) String() string {
-	return time.Weekday(self).String()
+func (w Weekday) String() string {
+	return time.Weekday(w).String()
 }
 
 // Implement Schedule interface.
-func (self Weekday) IsOccurring(t time.Time) bool {
-	return t.Weekday() == time.Weekday(self)
+func (w Weekday) IsOccurring(t time.Time) bool {
+	return t.Weekday() == time.Weekday(w)
 }
 
 // Implement Schedule interface.
-func (self Weekday) Occurrences(tr TimeRange) chan time.Time {
-	return occurrencesFor(self, tr)
+func (w Weekday) Occurrences(tr TimeRange) chan time.Time {
+	return occurrencesFor(w, tr)
 }
 
-func (self Weekday) nextAfter(t time.Time) (time.Time, error) {
-	diff := int(self) - int(t.Weekday())
+func (w Weekday) nextAfter(t time.Time) (time.Time, error) {
+	diff := int(w) - int(t.Weekday())
 	if diff <= 0 {
 		diff += 7
 	}
@@ -43,27 +43,27 @@ func (self Weekday) nextAfter(t time.Time) (time.Time, error) {
 }
 
 // Implement json.Marshaler interface.
-func (self Weekday) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"weekday": time.Weekday(self).String()})
+func (w Weekday) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"weekday": time.Weekday(w).String()})
 }
 
 // Implement json.Unmarshaler interface.
-func (self *Weekday) UnmarshalJSON(b []byte) error {
+func (w *Weekday) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `0`, `"Sunday"`:
-		*self = Sunday
+		*w = Sunday
 	case `1`, `"Monday"`:
-		*self = Monday
+		*w = Monday
 	case `2`, `"Tuesday"`:
-		*self = Tuesday
+		*w = Tuesday
 	case `3`, `"Wednesday"`:
-		*self = Wednesday
+		*w = Wednesday
 	case `4`, `"Thursday"`:
-		*self = Thursday
+		*w = Thursday
 	case `5`, `"Friday"`:
-		*self = Friday
+		*w = Friday
 	case `6`, `"Saturday"`:
-		*self = Saturday
+		*w = Saturday
 	default:
 		return fmt.Errorf("Weekday cannot unmarshal %s", b)
 	}

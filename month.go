@@ -25,22 +25,22 @@ const (
 )
 
 // Implement Stringer interface.
-func (self Month) String() string {
-	return time.Month(self).String()
+func (m Month) String() string {
+	return time.Month(m).String()
 }
 
 // Implement Schedule interface.
-func (self Month) IsOccurring(t time.Time) bool {
-	return t.Month() == time.Month(self)
+func (m Month) IsOccurring(t time.Time) bool {
+	return t.Month() == time.Month(m)
 }
 
 // Implement Schedule interface.
-func (self Month) Occurrences(tr TimeRange) chan time.Time {
-	return occurrencesFor(self, tr)
+func (m Month) Occurrences(tr TimeRange) chan time.Time {
+	return occurrencesFor(m, tr)
 }
 
-func (self Month) nextAfter(t time.Time) (time.Time, error) {
-	desiredMonth := int(self)
+func (m Month) nextAfter(t time.Time) (time.Time, error) {
+	desiredMonth := int(m)
 	tMonth := int(t.Month())
 
 	if tMonth < desiredMonth {
@@ -55,37 +55,37 @@ func (self Month) nextAfter(t time.Time) (time.Time, error) {
 }
 
 // Implement json.Marshaler interface.
-func (self Month) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"month": time.Month(self).String()})
+func (m Month) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"month": time.Month(m).String()})
 }
 
 // Implement json.Unmarshaler interface.
-func (self *Month) UnmarshalJSON(b []byte) error {
+func (m *Month) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `1`, `"January"`:
-		*self = January
+		*m = January
 	case `2`, `"February"`:
-		*self = February
+		*m = February
 	case `3`, `"March"`:
-		*self = March
+		*m = March
 	case `4`, `"April"`:
-		*self = April
+		*m = April
 	case `5`, `"May"`:
-		*self = May
+		*m = May
 	case `6`, `"June"`:
-		*self = June
+		*m = June
 	case `7`, `"July"`:
-		*self = July
+		*m = July
 	case `8`, `"August"`:
-		*self = August
+		*m = August
 	case `9`, `"September"`:
-		*self = September
+		*m = September
 	case `10`, `"October"`:
-		*self = October
+		*m = October
 	case `11`, `"November"`:
-		*self = November
+		*m = November
 	case `12`, `"December"`:
-		*self = December
+		*m = December
 	default:
 		return fmt.Errorf("Weekday cannot unmarshal %s", b)
 	}
