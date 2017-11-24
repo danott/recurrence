@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-// Computes the set intersection of a slice of Schedules.
+// Intersection computes the set intersection of a slice of Schedules.
 type Intersection []Schedule
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (i Intersection) IsOccurring(t time.Time) bool {
 	for _, r := range i {
 		if r.IsOccurring(t) == false {
@@ -20,7 +20,7 @@ func (i Intersection) IsOccurring(t time.Time) bool {
 	return true
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (i Intersection) Occurrences(t TimeRange) chan time.Time {
 	ch := make(chan time.Time)
 	done := make(chan bool, len(i))
@@ -60,7 +60,7 @@ func (i Intersection) Occurrences(t TimeRange) chan time.Time {
 	return ch
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (i Intersection) MarshalJSON() ([]byte, error) {
 	type wrapper struct {
 		Intersection []Schedule `json:"intersection"`
@@ -68,7 +68,7 @@ func (i Intersection) MarshalJSON() ([]byte, error) {
 	return json.Marshal(wrapper{Intersection: i})
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (i *Intersection) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 

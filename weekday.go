@@ -9,6 +9,7 @@ import (
 // A Weekday represents a day of the week. (Sunday, Monday, ...Saturday)
 type Weekday time.Weekday
 
+// The days of the week
 const (
 	Sunday Weekday = iota
 	Monday
@@ -19,17 +20,17 @@ const (
 	Saturday
 )
 
-// Implement Stringer interface.
+// implements the Stringer interface.
 func (w Weekday) String() string {
 	return time.Weekday(w).String()
 }
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (w Weekday) IsOccurring(t time.Time) bool {
 	return t.Weekday() == time.Weekday(w)
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (w Weekday) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(w, tr)
 }
@@ -42,12 +43,12 @@ func (w Weekday) nextAfter(t time.Time) (time.Time, error) {
 	return t.AddDate(0, 0, diff), nil
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (w Weekday) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"weekday": time.Weekday(w).String()})
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (w *Weekday) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `0`, `"Sunday"`:

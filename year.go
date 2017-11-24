@@ -6,20 +6,20 @@ import (
 	"time"
 )
 
-// Represents a year.
+// Year represents a year.
 type Year int
 
-// Implement Stringer interface.
+// implements the Stringer interface.
 func (y Year) String() string {
 	return string(y)
 }
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (y Year) IsOccurring(t time.Time) bool {
 	return t.Year() == int(y)
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (y Year) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(y, tr)
 }
@@ -39,7 +39,7 @@ func (y Year) nextAfter(t time.Time) (time.Time, error) {
 	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (y Year) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"year": int(y)})
 }

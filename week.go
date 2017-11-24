@@ -11,7 +11,7 @@ import (
 // with other entities satisfying the Schedule interface.
 type Week int
 
-// Implement Stringer interface.
+// implements the Stringer interface.
 func (w Week) String() string {
 	switch int(w) {
 	case 1:
@@ -31,7 +31,7 @@ func (w Week) String() string {
 	}
 }
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (w Week) IsOccurring(t time.Time) bool {
 	weekInt := int(w)
 
@@ -42,7 +42,7 @@ func (w Week) IsOccurring(t time.Time) bool {
 	return weekInMonth(t) == weekInt
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (w Week) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(w, tr)
 }
@@ -129,7 +129,7 @@ func (w Week) nextAfter(t time.Time) (time.Time, error) {
 	return t, fmt.Errorf("You should never get here")
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (w Week) MarshalJSON() ([]byte, error) {
 	if int(w) == Last {
 		return json.Marshal(map[string]interface{}{"week": "Last"})
@@ -138,7 +138,7 @@ func (w Week) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"week": int(w)})
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (w *Week) UnmarshalJSON(b []byte) error {
 	switch s := string(b); s {
 	case `1`, `2`, `3`, `4`, `5`:

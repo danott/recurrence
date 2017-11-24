@@ -9,6 +9,7 @@ import (
 // A Month represents a month of the year. Just like time.Month.
 type Month time.Month
 
+// The months of the year
 const (
 	January Month = 1 + iota
 	February
@@ -24,17 +25,17 @@ const (
 	December
 )
 
-// Implement Stringer interface.
+// String implements the Stringer interface.
 func (m Month) String() string {
 	return time.Month(m).String()
 }
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (m Month) IsOccurring(t time.Time) bool {
 	return t.Month() == time.Month(m)
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (m Month) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(m, tr)
 }
@@ -54,12 +55,12 @@ func (m Month) nextAfter(t time.Time) (time.Time, error) {
 	return t.AddDate(0, 0, 1), nil
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (m Month) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"month": time.Month(m).String()})
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (m *Month) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `1`, `"January"`:

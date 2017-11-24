@@ -10,7 +10,7 @@ import (
 // A Day specifies a day of the month. (1, 2, 3, ...31)
 type Day int
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (d Day) IsOccurring(t time.Time) bool {
 	dayInt := int(d)
 
@@ -21,7 +21,7 @@ func (d Day) IsOccurring(t time.Time) bool {
 	return dayInt == t.Day()
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (d Day) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(d, tr)
 }
@@ -62,7 +62,7 @@ func (d Day) nextAfter(t time.Time) (time.Time, error) {
 	return t.AddDate(0, 1, 0), nil
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (d Day) MarshalJSON() ([]byte, error) {
 	if int(d) == Last {
 		return json.Marshal(map[string]interface{}{"day": "Last"})
@@ -71,7 +71,7 @@ func (d Day) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{"day": int(d)})
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (d *Day) UnmarshalJSON(b []byte) error {
 	s := string(b)
 

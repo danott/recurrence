@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-// Computes the set union of a slice of Schedules.
+// Union computes the set union of a slice of Schedules.
 type Union []Schedule
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (u Union) IsOccurring(t time.Time) bool {
 	for _, r := range u {
 		if r.IsOccurring(t) {
@@ -20,7 +20,7 @@ func (u Union) IsOccurring(t time.Time) bool {
 	return false
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (u Union) Occurrences(t TimeRange) chan time.Time {
 	ch := make(chan time.Time)
 	done := make(chan bool, len(u))
@@ -59,7 +59,7 @@ func (u Union) Occurrences(t TimeRange) chan time.Time {
 	return ch
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (u Union) MarshalJSON() ([]byte, error) {
 	type wrapper struct {
 		Union []Schedule `json:"union"`
@@ -67,7 +67,7 @@ func (u Union) MarshalJSON() ([]byte, error) {
 	return json.Marshal(wrapper{Union: u})
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (u *Union) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 

@@ -9,12 +9,12 @@ import (
 // Date is a specific day. Shorthand for Intersection{Year, Month, Day}.
 type Date time.Time
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (d Date) IsOccurring(t time.Time) bool {
 	return beginningOfDay(time.Time(d)).Equal(beginningOfDay(t))
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (d Date) Occurrences(tr TimeRange) chan time.Time {
 	return occurrencesFor(d, tr)
 }
@@ -28,7 +28,7 @@ func (d Date) nextAfter(t time.Time) (time.Time, error) {
 	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (d *Date) UnmarshalJSON(b []byte) error {
 	t, err := time.Parse(`"2006-01-02"`, string(b))
 
@@ -40,7 +40,7 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (d Date) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"date": time.Time(d).Format("2006-01-02"),

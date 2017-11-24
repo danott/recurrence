@@ -14,22 +14,22 @@ type AnySchedule struct {
 	Schedule Schedule
 }
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (a AnySchedule) IsOccurring(t time.Time) bool {
 	return a.Schedule.IsOccurring(t)
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (a AnySchedule) Occurrences(t TimeRange) chan time.Time {
 	return a.Schedule.Occurrences(t)
 }
 
-// Implement json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler interface.
 func (a AnySchedule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(a.Schedule)
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (a *AnySchedule) UnmarshalJSON(b []byte) error {
 	schedule, err := ScheduleUnmarshalJSON(b)
 
@@ -42,7 +42,7 @@ func (a *AnySchedule) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Unmarshal bytes representing any arbitrary relationship of schedules.
+// ScheduleUnmarshalJSON unmarshals bytes representing any arbitrary relationship of schedules.
 func ScheduleUnmarshalJSON(b []byte) (schedule Schedule, err error) {
 	var mixed interface{}
 	json.Unmarshal(b, &mixed)

@@ -12,12 +12,12 @@ type TimeRange struct {
 	End   time.Time
 }
 
-// Implement Schedule interface.
+// IsOccurring implements the Schedule interface.
 func (tr TimeRange) IsOccurring(t time.Time) bool {
 	return !(t.Before(tr.Start) || t.After(tr.End))
 }
 
-// Implement Schedule interface.
+// Occurrences implements the Schedule interface.
 func (tr TimeRange) Occurrences(other TimeRange) chan time.Time {
 	return occurrencesFor(tr, other)
 }
@@ -35,7 +35,7 @@ func (tr TimeRange) nextAfter(t time.Time) (time.Time, error) {
 	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
-// Implement json.Unmarshaler interface.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (tr *TimeRange) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 	var err error
@@ -68,7 +68,7 @@ func NewTimeRange(start, end string) TimeRange {
 	return TimeRange{tStart, tEnd}
 }
 
-// Generate a TimeRange representing the entire year.
+// YearRange generates a TimeRange representing the entire year.
 func YearRange(y int) TimeRange {
 	return TimeRange{
 		time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC),
@@ -76,7 +76,7 @@ func YearRange(y int) TimeRange {
 	}
 }
 
-// Generate a TimeRange representing a specific month.
+// MonthRange generates a TimeRange representing a specific month.
 func MonthRange(month interface{}, year int) TimeRange {
 	var m time.Month
 
