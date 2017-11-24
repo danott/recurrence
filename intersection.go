@@ -62,10 +62,10 @@ func (self Intersection) Occurrences(t TimeRange) chan time.Time {
 
 // Implement json.Marshaler interface.
 func (self Intersection) MarshalJSON() ([]byte, error) {
-	type faux Intersection
-	return json.Marshal(struct {
-		faux `json:"intersection"`
-	}{faux: faux(self)})
+	type wrapper struct {
+		Intersection []Schedule `json:"intersection"`
+	}
+	return json.Marshal(wrapper{Intersection: self})
 }
 
 // Implement json.Unmarshaler interface.

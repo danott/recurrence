@@ -61,10 +61,10 @@ func (self Union) Occurrences(t TimeRange) chan time.Time {
 
 // Implement json.Marshaler interface.
 func (self Union) MarshalJSON() ([]byte, error) {
-	type faux Union
-	return json.Marshal(struct {
-		faux `json:"union"`
-	}{faux: faux(self)})
+	type wrapper struct {
+		Union []Schedule `json:"union"`
+	}
+	return json.Marshal(wrapper{Union: self})
 }
 
 // Implement json.Unmarshaler interface.
