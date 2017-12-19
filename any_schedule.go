@@ -14,35 +14,35 @@ type AnySchedule struct {
 	Schedule Schedule
 }
 
-// Implement Schedule interface.
-func (self AnySchedule) IsOccurring(t time.Time) bool {
-	return self.Schedule.IsOccurring(t)
+// IsOccurring implements the Schedule interface.
+func (a AnySchedule) IsOccurring(t time.Time) bool {
+	return a.Schedule.IsOccurring(t)
 }
 
-// Implement Schedule interface.
-func (self AnySchedule) Occurrences(t TimeRange) chan time.Time {
-	return self.Schedule.Occurrences(t)
+// Occurrences implements the Schedule interface.
+func (a AnySchedule) Occurrences(t TimeRange) chan time.Time {
+	return a.Schedule.Occurrences(t)
 }
 
-// Implement json.Marshaler interface.
-func (d AnySchedule) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.Schedule)
+// MarshalJSON implements the json.Marshaler interface.
+func (a AnySchedule) MarshalJSON() ([]byte, error) {
+	return json.Marshal(a.Schedule)
 }
 
-// Implement json.Unmarshaler interface.
-func (self *AnySchedule) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (a *AnySchedule) UnmarshalJSON(b []byte) error {
 	schedule, err := ScheduleUnmarshalJSON(b)
 
 	if err != nil {
 		return err
-	} else {
-		self.Schedule = schedule
 	}
+
+	a.Schedule = schedule
 
 	return nil
 }
 
-// Unmarshal bytes representing any arbitrary relationship of schedules.
+// ScheduleUnmarshalJSON unmarshals bytes representing any arbitrary relationship of schedules.
 func ScheduleUnmarshalJSON(b []byte) (schedule Schedule, err error) {
 	var mixed interface{}
 	json.Unmarshal(b, &mixed)

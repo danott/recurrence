@@ -6,26 +6,26 @@ import (
 	"time"
 )
 
-// Represents a year.
+// Year represents a year.
 type Year int
 
-// Implement Stringer interface.
-func (self Year) String() string {
-	return string(self)
+// implements the Stringer interface.
+func (y Year) String() string {
+	return string(y)
 }
 
-// Implement Schedule interface.
-func (self Year) IsOccurring(t time.Time) bool {
-	return t.Year() == int(self)
+// IsOccurring implements the Schedule interface.
+func (y Year) IsOccurring(t time.Time) bool {
+	return t.Year() == int(y)
 }
 
-// Implement Schedule interface.
-func (self Year) Occurrences(tr TimeRange) chan time.Time {
-	return occurrencesFor(self, tr)
+// Occurrences implements the Schedule interface.
+func (y Year) Occurrences(tr TimeRange) chan time.Time {
+	return occurrencesFor(y, tr)
 }
 
-func (self Year) nextAfter(t time.Time) (time.Time, error) {
-	desiredYear := int(self)
+func (y Year) nextAfter(t time.Time) (time.Time, error) {
+	desiredYear := int(y)
 
 	if t.Year() == desiredYear && !isLastDayOfYear(t) {
 		return t.AddDate(0, 0, 1), nil
@@ -39,9 +39,9 @@ func (self Year) nextAfter(t time.Time) (time.Time, error) {
 	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
-// Implement json.Marshaler interface.
-func (self Year) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]interface{}{"year": int(self)})
+// MarshalJSON implements the json.Marshaler interface.
+func (y Year) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{"year": int(y)})
 }
 
 func isLastDayOfYear(t time.Time) bool {

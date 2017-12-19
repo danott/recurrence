@@ -11,9 +11,9 @@ import (
 // with other entities satisfying the Schedule interface.
 type Week int
 
-// Implement Stringer interface.
-func (self Week) String() string {
-	switch int(self) {
+// implements the Stringer interface.
+func (w Week) String() string {
+	switch int(w) {
 	case 1:
 		return "(First Week)"
 	case 2:
@@ -31,22 +31,24 @@ func (self Week) String() string {
 	}
 }
 
-// Implement Schedule interface.
-func (self Week) IsOccurring(t time.Time) bool {
-	if weekInt := int(self); weekInt == Last {
+// IsOccurring implements the Schedule interface.
+func (w Week) IsOccurring(t time.Time) bool {
+	weekInt := int(w)
+
+	if weekInt == Last {
 		return isLastWeekInMonth(t)
-	} else {
-		return weekInMonth(t) == weekInt
 	}
+
+	return weekInMonth(t) == weekInt
 }
 
-// Implement Schedule interface.
-func (self Week) Occurrences(tr TimeRange) chan time.Time {
-	return occurrencesFor(self, tr)
+// Occurrences implements the Schedule interface.
+func (w Week) Occurrences(tr TimeRange) chan time.Time {
+	return occurrencesFor(w, tr)
 }
 
-func (self Week) nextAfter(t time.Time) (time.Time, error) {
-	desiredWeek := int(self)
+func (w Week) nextAfter(t time.Time) (time.Time, error) {
+	desiredWeek := int(w)
 
 	if desiredWeek == 1 {
 		if t.Day() < 7 || isLastDayInMonth(t) {
@@ -96,11 +98,11 @@ func (self Week) nextAfter(t time.Time) (time.Time, error) {
 		totalDaysInMonth := lastDayOfMonth(t).Day()
 
 		if totalDaysInMonth < 29 {
-			return self.nextAfter(t.AddDate(0, 1, 0))
+			return w.nextAfter(t.AddDate(0, 1, 0))
 		}
 
 		if isLastDayInMonth(t) {
-			return self.nextAfter(t.AddDate(0, 0, 1))
+			return w.nextAfter(t.AddDate(0, 0, 1))
 		}
 
 		if t.Day() < 27 {
@@ -114,7 +116,7 @@ func (self Week) nextAfter(t time.Time) (time.Time, error) {
 		totalDaysInMonth := lastDayOfMonth(t).Day()
 
 		if isLastDayInMonth(t) {
-			return self.nextAfter(t.AddDate(0, 0, 1))
+			return w.nextAfter(t.AddDate(0, 0, 1))
 		}
 
 		if t.Day() < totalDaysInMonth-7 {
@@ -124,29 +126,29 @@ func (self Week) nextAfter(t time.Time) (time.Time, error) {
 		return t.AddDate(0, 0, 1), nil
 	}
 
-	return t, fmt.Errorf("You should never get here.")
+	return t, fmt.Errorf("You should never get here")
 }
 
-// Implement json.Marshaler interface.
-func (self Week) MarshalJSON() ([]byte, error) {
-	if int(self) == Last {
+// MarshalJSON implements the json.Marshaler interface.
+func (w Week) MarshalJSON() ([]byte, error) {
+	if int(w) == Last {
 		return json.Marshal(map[string]interface{}{"week": "Last"})
-	} else {
-		return json.Marshal(map[string]interface{}{"week": int(self)})
 	}
+
+	return json.Marshal(map[string]interface{}{"week": int(w)})
 }
 
-// Implement json.Unmarshaler interface.
-func (self *Week) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (w *Week) UnmarshalJSON(b []byte) error {
 	switch s := string(b); s {
 	case `1`, `2`, `3`, `4`, `5`:
 		i, err := strconv.ParseInt(s, 10, 0)
 		if err != nil {
 			return err
 		}
-		*self = Week(i)
+		*w = Week(i)
 	case `"Last"`:
-		*self = Week(Last)
+		*w = Week(Last)
 	default:
 		return fmt.Errorf("Week cannot unmarshal %s", b)
 	}

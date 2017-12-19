@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-// Computes the set union of a slice of Schedules.
+// Union computes the set union of a slice of Schedules.
 type Union []Schedule
 
-// Implement Schedule interface.
-func (self Union) IsOccurring(t time.Time) bool {
-	for _, r := range self {
+// IsOccurring implements the Schedule interface.
+func (u Union) IsOccurring(t time.Time) bool {
+	for _, r := range u {
 		if r.IsOccurring(t) {
 			return true
 		}
@@ -20,13 +20,13 @@ func (self Union) IsOccurring(t time.Time) bool {
 	return false
 }
 
-// Implement Schedule interface.
-func (self Union) Occurrences(t TimeRange) chan time.Time {
+// Occurrences implements the Schedule interface.
+func (u Union) Occurrences(t TimeRange) chan time.Time {
 	ch := make(chan time.Time)
-	done := make(chan bool, len(self))
+	done := make(chan bool, len(u))
 	candidates := make(chan time.Time)
 
-	for _, schedule := range self {
+	for _, schedule := range u {
 		go func(schedule Schedule) {
 			for t := range schedule.Occurrences(t) {
 
@@ -49,7 +49,7 @@ func (self Union) Occurrences(t TimeRange) chan time.Time {
 	}()
 
 	go func() {
-		for i := 0; i < len(self); i++ {
+		for i := 0; i < len(u); i++ {
 			<-done
 		}
 		close(ch)
@@ -59,16 +59,16 @@ func (self Union) Occurrences(t TimeRange) chan time.Time {
 	return ch
 }
 
-// Implement json.Marshaler interface.
-func (self Union) MarshalJSON() ([]byte, error) {
-	type faux Union
-	return json.Marshal(struct {
-		faux `json:"union"`
-	}{faux: faux(self)})
+// MarshalJSON implements the json.Marshaler interface.
+func (u Union) MarshalJSON() ([]byte, error) {
+	type wrapper struct {
+		Union []Schedule `json:"union"`
+	}
+	return json.Marshal(wrapper{Union: u})
 }
 
-// Implement json.Unmarshaler interface.
-func (self *Union) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (u *Union) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 
 	json.Unmarshal(b, &mixed)
@@ -81,7 +81,7 @@ func (self *Union) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*self = append(*self, schedule)
+			*u = append(*u, schedule)
 		}
 	default:
 		return fmt.Errorf("union must be a slice")

@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-// Computes the set intersection of a slice of Schedules.
+// Intersection computes the set intersection of a slice of Schedules.
 type Intersection []Schedule
 
-// Implement Schedule interface.
-func (self Intersection) IsOccurring(t time.Time) bool {
-	for _, r := range self {
+// IsOccurring implements the Schedule interface.
+func (i Intersection) IsOccurring(t time.Time) bool {
+	for _, r := range i {
 		if r.IsOccurring(t) == false {
 			return false
 		}
@@ -20,13 +20,13 @@ func (self Intersection) IsOccurring(t time.Time) bool {
 	return true
 }
 
-// Implement Schedule interface.
-func (self Intersection) Occurrences(t TimeRange) chan time.Time {
+// Occurrences implements the Schedule interface.
+func (i Intersection) Occurrences(t TimeRange) chan time.Time {
 	ch := make(chan time.Time)
-	done := make(chan bool, len(self))
+	done := make(chan bool, len(i))
 	candidates := make(chan time.Time)
 
-	for _, schedule := range self {
+	for _, schedule := range i {
 		go func(schedule Schedule) {
 			for t := range schedule.Occurrences(t) {
 				candidates <- t
@@ -42,14 +42,14 @@ func (self Intersection) Occurrences(t TimeRange) chan time.Time {
 			foundCount, _ := candidatesMap[key]
 			newFoundCount := foundCount + 1
 			candidatesMap[key] = newFoundCount
-			if newFoundCount == len(self) {
+			if newFoundCount == len(i) {
 				ch <- candidate
 			}
 		}
 	}()
 
 	go func() {
-		for i := 0; i < len(self); i++ {
+		for j := 0; j < len(i); j++ {
 			<-done
 		}
 		close(ch)
@@ -60,16 +60,16 @@ func (self Intersection) Occurrences(t TimeRange) chan time.Time {
 	return ch
 }
 
-// Implement json.Marshaler interface.
-func (self Intersection) MarshalJSON() ([]byte, error) {
-	type faux Intersection
-	return json.Marshal(struct {
-		faux `json:"intersection"`
-	}{faux: faux(self)})
+// MarshalJSON implements the json.Marshaler interface.
+func (i Intersection) MarshalJSON() ([]byte, error) {
+	type wrapper struct {
+		Intersection []Schedule `json:"intersection"`
+	}
+	return json.Marshal(wrapper{Intersection: i})
 }
 
-// Implement json.Unmarshaler interface.
-func (self *Intersection) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (i *Intersection) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 
 	json.Unmarshal(b, &mixed)
@@ -82,7 +82,7 @@ func (self *Intersection) UnmarshalJSON(b []byte) error {
 			if err != nil {
 				return err
 			}
-			*self = append(*self, schedule)
+			*i = append(*i, schedule)
 		}
 	default:
 		return fmt.Errorf("intersection must be a slice")

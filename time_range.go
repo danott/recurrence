@@ -12,22 +12,22 @@ type TimeRange struct {
 	End   time.Time
 }
 
-// Implement Schedule interface.
-func (self TimeRange) IsOccurring(t time.Time) bool {
-	return !(t.Before(self.Start) || t.After(self.End))
+// IsOccurring implements the Schedule interface.
+func (tr TimeRange) IsOccurring(t time.Time) bool {
+	return !(t.Before(tr.Start) || t.After(tr.End))
 }
 
-// Implement Schedule interface.
-func (self TimeRange) Occurrences(other TimeRange) chan time.Time {
-	return occurrencesFor(self, other)
+// Occurrences implements the Schedule interface.
+func (tr TimeRange) Occurrences(other TimeRange) chan time.Time {
+	return occurrencesFor(tr, other)
 }
 
-func (self TimeRange) nextAfter(t time.Time) (time.Time, error) {
-	if t.Before(self.Start) {
-		return self.Start, nil
+func (tr TimeRange) nextAfter(t time.Time) (time.Time, error) {
+	if t.Before(tr.Start) {
+		return tr.Start, nil
 	}
 
-	if t.Before(self.End) {
+	if t.Before(tr.End) {
 		return t.AddDate(0, 0, 1), nil
 	}
 
@@ -35,8 +35,8 @@ func (self TimeRange) nextAfter(t time.Time) (time.Time, error) {
 	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
-// Implement json.Unmarshaler interface.
-func (self *TimeRange) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (tr *TimeRange) UnmarshalJSON(b []byte) error {
 	var mixed interface{}
 	var err error
 
@@ -44,11 +44,11 @@ func (self *TimeRange) UnmarshalJSON(b []byte) error {
 
 	value, _ := mixed.(map[string]interface{})["start"]
 	t, _ := time.Parse("2006-01-02", value.(string))
-	self.Start = t
+	tr.Start = t
 
 	value, _ = mixed.(map[string]interface{})["end"]
 	t, _ = time.Parse("2006-01-02", value.(string))
-	self.End = t
+	tr.End = t
 
 	return err
 }
@@ -68,7 +68,7 @@ func NewTimeRange(start, end string) TimeRange {
 	return TimeRange{tStart, tEnd}
 }
 
-// Generate a TimeRange representing the entire year.
+// YearRange generates a TimeRange representing the entire year.
 func YearRange(y int) TimeRange {
 	return TimeRange{
 		time.Date(y, time.January, 1, 0, 0, 0, 0, time.UTC),
@@ -76,7 +76,7 @@ func YearRange(y int) TimeRange {
 	}
 }
 
-// Generate a TimeRange representing a specific month.
+// MonthRange generates a TimeRange representing a specific month.
 func MonthRange(month interface{}, year int) TimeRange {
 	var m time.Month
 
@@ -101,11 +101,11 @@ func beginningOfDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
 
-func (self TimeRange) eachDate() chan time.Time {
+func (tr TimeRange) eachDate() chan time.Time {
 	c := make(chan time.Time)
 
 	go func() {
-		for t := beginningOfDay(self.Start); !t.After(self.End); t = t.AddDate(0, 0, 1) {
+		for t := beginningOfDay(tr.Start); !t.After(tr.End); t = t.AddDate(0, 0, 1) {
 			c <- t
 		}
 		close(c)

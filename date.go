@@ -9,41 +9,41 @@ import (
 // Date is a specific day. Shorthand for Intersection{Year, Month, Day}.
 type Date time.Time
 
-// Implement Schedule interface.
-func (self Date) IsOccurring(t time.Time) bool {
-	return beginningOfDay(time.Time(self)).Equal(beginningOfDay(t))
+// IsOccurring implements the Schedule interface.
+func (d Date) IsOccurring(t time.Time) bool {
+	return beginningOfDay(time.Time(d)).Equal(beginningOfDay(t))
 }
 
-// Implement Schedule interface.
-func (self Date) Occurrences(tr TimeRange) chan time.Time {
-	return occurrencesFor(self, tr)
+// Occurrences implements the Schedule interface.
+func (d Date) Occurrences(tr TimeRange) chan time.Time {
+	return occurrencesFor(d, tr)
 }
 
-func (self Date) nextAfter(t time.Time) (time.Time, error) {
-	if t.Before(time.Time(self)) {
-		return time.Time(self), nil
+func (d Date) nextAfter(t time.Time) (time.Time, error) {
+	if t.Before(time.Time(d)) {
+		return time.Time(d), nil
 	}
 
 	var zeroTime time.Time
 	return zeroTime, fmt.Errorf("no more occurrences after %s", t)
 }
 
-// Implement json.Unmarshaler interface.
-func (self *Date) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (d *Date) UnmarshalJSON(b []byte) error {
 	t, err := time.Parse(`"2006-01-02"`, string(b))
 
 	if err != nil {
 		return err
 	}
 
-	*self = Date(t)
+	*d = Date(t)
 	return nil
 }
 
-// Implement json.Marshaler interface.
-func (self Date) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (d Date) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"date": time.Time(self).Format("2006-01-02"),
+		"date": time.Time(d).Format("2006-01-02"),
 	})
 }
 
